@@ -1,0 +1,83 @@
+{
+  "manifest_version": 1,
+  "documents": [
+    {
+      "document_id": "fia-f1-2026-section-a-issue-03",
+      "section": "A",
+      "title": "General Regulatory Provisions",
+      "season": 2026,
+      "issue_number": 3,
+      "published_date": "2026-06-25",
+      "wmsc_approval_date": "2026-06-23",
+      "source_path": "regulations/fia_f1_2026_section_a_general_regulatory_provisions_issue_03_2026-06-25.pdf",
+      "sha256": "6ce8c9420ddb8194e1b5ea8f678dbbdcb4bb2094780e636324b709ee70d276d6",
+      "page_count": 84,
+      "is_active": true
+    },
+    {
+      "document_id": "fia-f1-2026-section-b-issue-08",
+      "section": "B",
+      "title": "Sporting Regulations",
+      "season": 2026,
+      "issue_number": 8,
+      "published_date": "2026-08-05",
+      "wmsc_approval_date": "2026-08-03",
+      "source_path": "regulations/fia_f1_2026_section_b_sporting_regulations_issue_08_2026-08-05.pdf",
+      "sha256": "cbe329807d7803a4db511f80d829de1212d0c6a1c3b327cddb1b841823baa9fd",
+      "page_count": 98,
+      "is_active": true
+    },
+    {
+      "document_id": "fia-f1-2026-section-c-issue-20",
+      "section": "C",
+      "title": "Technical Regulations",
+      "season": 2026,
+      "issue_number": 20,
+      "published_date": "2026-08-05",
+      "wmsc_approval_date": "2026-08-03",
+      "source_path": "regulations/fia_f1_2026_section_c_technical_regulations_issue_20_2026-08-05.pdf",
+      "sha256": "cf0b919eef5eecc27497fb6de012f8d27e200f6dbd34d62b7e5385f7274ff652",
+      "page_count": 254,
+      "is_active": true
+    },
+    {
+      "document_id": "fia-f1-2026-section-d-issue-07",
+      "section": "D",
+      "title": "Financial Regulations (F1 Teams)",
+      "season": 2026,
+      "issue_number": 7,
+      "published_date": "2026-06-25",
+      "wmsc_approval_date": "2026-06-23",
+      "source_path": "regulations/fia_f1_2026_section_d_financial_f1_teams_issue_07_2026-06-25.pdf",
+      "sha256": "b38f5a1b2c67edbe3c86e4f7d4adbfce6321504f8733a70201508b99ed4717b5",
+      "page_count": 64,
+      "is_active": true
+    },
+    {
+      "document_id": "fia-f1-2026-section-e-issue-06",
+      "section": "E",
+      "title": "Financial Regulations (Power Unit Manufacturers)",
+      "season": 2026,
+      "issue_number": 6,
+      "published_date": "2026-06-25",
+      "wmsc_approval_date": "2026-06-23",
+      "source_path": "regulations/fia_f1_2026_section_e_financial_pu_manufacturers_issue_06_2026-06-25.pdf",
+      "sha256": "7fed64aae631c008bc31669bf32e0d9d102bf416f08da48a240b72f5ee1bd658",
+      "page_count": 60,
+      "is_active": true
+    },
+    {
+      "document_id": "fia-f1-2026-section-f-issue-10",
+      "section": "F",
+      "title": "Operational Regulations",
+      "season": 2026,
+      "issue_number": 10,
+      "published_date": "2026-08-05",
+      "wmsc_approval_date": "2026-08-03",
+      "source_path": "regulations/fia_f1_2026_section_f_operational_regulations_issue_10_2026-08-05.pdf",
+      "sha256": "c53c9f07e6313d0c0a0263204d745ba1f99e8c496286924a2166bc66dac38845",
+      "page_count": 32,
+      "is_active": true
+    }
+  ]
+}
