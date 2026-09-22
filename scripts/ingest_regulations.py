@@ -2,6 +2,7 @@ from pathlib import Path
 
 from pole_position.corpus.manifest import load_manifest
 from pole_position.corpus.verification import verify_local_corpus
+from pole_position.rag.ingestion.normalizer import normalize_document
 from pole_position.rag.ingestion.pdf_extractor import extract_pdf
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +30,18 @@ def main() -> None:
     )
 
     print(f"Extracted {len(extracted_document.pages)} pages to {artifact_path}")
+
+    normalized_document = normalize_document(extracted_document)
+
+    normalized_directory = PROJECT_ROOT / "artifacts/normalized"
+    normalized_directory.mkdir(parents=True, exist_ok=True)
+
+    normalized_path = normalized_directory / f"{section_a.document_id}.json"
+    normalized_path.write_text(
+        normalized_document.model_dump_json(indent=2), encoding="utf-8"
+    )
+
+    print(f"Normalized {len(normalized_document.pages)} pages to {normalized_path}")
 
 
 if __name__ == "__main__":
