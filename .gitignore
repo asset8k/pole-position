@@ -18,4 +18,7 @@ project_guide.md
 !.env.example
 
 # Original pdfs of relugations
-regulations
+regulations/
+
+# Artifacts
+artifacts/
