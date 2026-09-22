@@ -2,6 +2,7 @@ from pathlib import Path
 
 from pole_position.corpus.manifest import load_manifest
 from pole_position.corpus.verification import verify_local_corpus
+from pole_position.rag.ingestion.clause_parser import parse_clauses
 from pole_position.rag.ingestion.normalizer import normalize_document
 from pole_position.rag.ingestion.pdf_extractor import extract_pdf
 from pole_position.rag.ingestion.structure_parser import parse_document
@@ -53,6 +54,16 @@ def main() -> None:
     parsed_path.write_text(parsed_document.model_dump_json(indent=2), encoding="utf-8")
 
     print(f"Parsed {len(parsed_document.units)} units to {parsed_path}")
+
+    parsed_clauses = parse_clauses(normalized_document)
+
+    clauses_directory = PROJECT_ROOT / "artifacts/clauses"
+    clauses_directory.mkdir(parents=True, exist_ok=True)
+
+    clauses_path = clauses_directory / f"{section_a.document_id}.json"
+    clauses_path.write_text(parsed_clauses.model_dump_json(indent=2), encoding="utf-8")
+
+    print(f"Parsed {len(parsed_clauses.clauses)} clauses to {clauses_path}")
 
 
 if __name__ == "__main__":
