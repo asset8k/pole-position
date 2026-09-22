@@ -1,6 +1,8 @@
-from typing import Self
+from typing import Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
+
+ParsedUnitKind = Literal["preamble", "article", "appendix"]
 
 
 class ExtractedPage(BaseModel):
@@ -24,3 +26,18 @@ class ExtractedDocument(BaseModel):
             )
 
         return self
+
+
+class ParsedUnit(BaseModel):
+    kind: ParsedUnitKind
+    identifier: str | None = None
+    title: str
+    text: str
+    start_pdf_page: int = Field(gt=0)
+    end_pdf_page: int = Field(gt=0)
+
+
+class ParsedDocument(BaseModel):
+    document_id: str = Field(min_length=1)
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    units: list[ParsedUnit] = Field(min_length=1)

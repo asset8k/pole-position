@@ -4,6 +4,7 @@ from pole_position.corpus.manifest import load_manifest
 from pole_position.corpus.verification import verify_local_corpus
 from pole_position.rag.ingestion.normalizer import normalize_document
 from pole_position.rag.ingestion.pdf_extractor import extract_pdf
+from pole_position.rag.ingestion.structure_parser import parse_document
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = PROJECT_ROOT / "data/manifests/2026_f1_regulations.json"
@@ -42,6 +43,16 @@ def main() -> None:
     )
 
     print(f"Normalized {len(normalized_document.pages)} pages to {normalized_path}")
+
+    parsed_document = parse_document(normalized_document)
+
+    parsed_directory = PROJECT_ROOT / "artifacts/parsed"
+    parsed_directory.mkdir(parents=True, exist_ok=True)
+
+    parsed_path = parsed_directory / f"{section_a.document_id}.json"
+    parsed_path.write_text(parsed_document.model_dump_json(indent=2), encoding="utf-8")
+
+    print(f"Parsed {len(parsed_document.units)} units to {parsed_path}")
 
 
 if __name__ == "__main__":
