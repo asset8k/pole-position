@@ -1,7 +1,6 @@
 from pole_position.rag.contracts import ExtractedDocument, ExtractedPage
 from pole_position.rag.ingestion.clause_parser import parse_clauses
 
-
 SOURCE_SHA256 = "a" * 64
 
 
@@ -47,7 +46,7 @@ def test_parse_clauses_collects_article_clauses_and_page_ranges() -> None:
     assert parsed.source_sha256 == document.source_sha256
 
     assert [
-        (clause.article_identifier, clause.identifier, clause.title)
+        (clause.article_identifier, clause.clause_identifier, clause.title)
         for clause in parsed.clauses
     ] == [
         ("A1", "A1.1", "Overview"),

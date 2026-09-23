@@ -90,7 +90,7 @@ def parse_clauses(document: ExtractedDocument) -> ParsedClauseDocument:
         clauses.append(
             ParsedClause(
                 article_identifier=current_article_identifier,
-                identifier=current_clause_identifier,
+                clause_identifier=current_clause_identifier,
                 title=current_clause_title,
                 text="\n".join(current_lines).strip(),
                 start_pdf_page=current_start_page,

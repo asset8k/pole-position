@@ -3,6 +3,7 @@ from typing import Literal, Self
 from pydantic import BaseModel, Field, model_validator
 
 ParsedUnitKind = Literal["preamble", "article", "appendix"]
+RegulationSection = Literal["A", "B", "C", "D", "E", "F"]
 
 
 class ExtractedPage(BaseModel):
@@ -45,7 +46,7 @@ class ParsedDocument(BaseModel):
 
 class ParsedClause(BaseModel):
     article_identifier: str = Field(pattern=r"^[A-F]\d+$")
-    identifier: str = Field(pattern=r"^[A-F]\d+(?:\.\d+)+$")
+    clause_identifier: str = Field(pattern=r"^[A-F]\d+(?:\.\d+)+$")
     title: str | None = None
     text: str = Field(min_length=1)
     start_pdf_page: int = Field(gt=0)
@@ -55,7 +56,7 @@ class ParsedClause(BaseModel):
     def validate_article_relationship_and_page_range(
         self: "ParsedClause",
     ) -> "ParsedClause":
-        if not self.identifier.startswith(f"{self.article_identifier}."):
+        if not self.clause_identifier.startswith(f"{self.article_identifier}."):
             raise ValueError("Clause identifier must belong to its parent Article")
 
         if self.end_pdf_page < self.start_pdf_page:
@@ -68,3 +69,36 @@ class ParsedClauseDocument(BaseModel):
     document_id: str = Field(min_length=1)
     source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     clauses: list[ParsedClause] = Field(min_length=1)
+
+
+class RetrievalChunk(BaseModel):
+    chunk_id: str = Field(min_length=1)
+    document_id: str = Field(min_length=1)
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    section: RegulationSection
+    article_identifier: str = Field(pattern=r"^[A-F]\d+$")
+    clause_identifier: str = Field(pattern=r"^[A-F]\d+(?:\.\d+)+$")
+    clause_title: str | None = None
+    chunk_index: int = Field(ge=0)
+    text: str = Field(min_length=1)
+    start_pdf_page: int = Field(gt=0)
+    end_pdf_page: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def validate_chunk_provenance(self) -> Self:
+        if not self.article_identifier.startswith(self.section):
+            raise ValueError("Article identifier must belong to its Section")
+
+        if not self.clause_identifier.startswith(f"{self.article_identifier}."):
+            raise ValueError("Clause identifier must belong to its parent Article")
+
+        if self.end_pdf_page < self.start_pdf_page:
+            raise ValueError("Chunk end PDF page cannot precede its start PDF page")
+
+        return self
+
+
+class ChunkedDocument(BaseModel):
+    document_id: str = Field(min_length=1)
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    chunks: list[RetrievalChunk] = Field(min_length=1)

@@ -2,6 +2,7 @@ from pathlib import Path
 
 from pole_position.corpus.manifest import load_manifest
 from pole_position.corpus.verification import verify_local_corpus
+from pole_position.rag.ingestion.clause_chunker import chunk_clauses
 from pole_position.rag.ingestion.clause_parser import parse_clauses
 from pole_position.rag.ingestion.normalizer import normalize_document
 from pole_position.rag.ingestion.pdf_extractor import extract_pdf
@@ -64,6 +65,16 @@ def main() -> None:
     clauses_path.write_text(parsed_clauses.model_dump_json(indent=2), encoding="utf-8")
 
     print(f"Parsed {len(parsed_clauses.clauses)} clauses to {clauses_path}")
+
+    chunked_clauses = chunk_clauses(parsed_clauses)
+
+    chunks_directory = PROJECT_ROOT / "artifacts/chunks"
+    chunks_directory.mkdir(parents=True, exist_ok=True)
+
+    chunks_path = chunks_directory / f"{section_a.document_id}.json"
+    chunks_path.write_text(chunked_clauses.model_dump_json(indent=2), encoding="utf-8")
+
+    print(f"Created {len(chunked_clauses.chunks)} chunks at {chunks_path}")
 
 
 if __name__ == "__main__":
