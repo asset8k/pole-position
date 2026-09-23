@@ -66,6 +66,14 @@ def test_parse_clauses_collects_article_clauses_and_page_ranges() -> None:
 
     assert second_clause.start_pdf_page == 2
     assert second_clause.end_pdf_page == 3
+    assert [
+        segment.pdf_page_number for segment in second_clause.page_segments
+    ] == [2, 3]
+    assert "Second clause text." in second_clause.page_segments[0].text
+    assert "continues clause A1.1.2" not in second_clause.page_segments[0].text
+    assert second_clause.page_segments[1].text == (
+        "This paragraph continues clause A1.1.2."
+    )
     assert "a." in second_clause.text
     assert "A lettered item" in second_clause.text
     assert "continues clause A1.1.2" in second_clause.text

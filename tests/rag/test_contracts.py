@@ -12,6 +12,7 @@ def make_chunk(**overrides: object) -> RetrievalChunk:
         "document_id": "fia-f1-2026-section-a-issue-03",
         "source_sha256": SOURCE_SHA256,
         "section": "A",
+        "source_kind": "clause",
         "article_identifier": "A1",
         "clause_identifier": "A1.2.3",
         "clause_title": None,

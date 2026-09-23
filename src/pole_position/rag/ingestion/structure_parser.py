@@ -2,6 +2,7 @@ import re
 
 from pole_position.rag.contracts import (
     ExtractedDocument,
+    PageTextSegment,
     ParsedDocument,
     ParsedUnit,
     ParsedUnitKind,
@@ -53,8 +54,18 @@ def find_first_content_line(lines: list[str]) -> int | None:
             None,
         )
 
-        if next_non_empty_line and next_non_empty_line.startswith(
-            "Advisory Committee:"
+        kind, identifier, _ = heading
+
+        if next_non_empty_line is None:
+            continue
+
+        if next_non_empty_line.startswith("Advisory Committee:"):
+            return index
+
+        if (
+            kind == "article"
+            and identifier is not None
+            and re.fullmatch(rf"{re.escape(identifier)}\.\d+", next_non_empty_line)
         ):
             return index
 
@@ -70,7 +81,40 @@ def parse_document(document: ExtractedDocument) -> ParsedDocument:
     current_start_page: int | None = None
     current_end_page: int | None = None
     current_lines: list[str] = []
+
+    current_page_number: int | None = None
+    current_page_lines: list[str] = []
+    current_page_segments: list[PageTextSegment] = []
+
     seen_appendix_identifiers: set[str] = set()
+
+    def save_page_segment() -> None:
+        nonlocal current_page_number, current_page_lines
+
+        if current_page_number is not None:
+            page_text = "\n".join(current_page_lines).strip()
+
+            if page_text:
+                current_page_segments.append(
+                    PageTextSegment(
+                        pdf_page_number=current_page_number,
+                        text=page_text,
+                    )
+                )
+
+        current_page_number = None
+        current_page_lines = []
+
+    def append_line(line: str, pdf_page_number: int) -> None:
+        nonlocal current_end_page, current_page_number
+
+        if current_page_number != pdf_page_number:
+            save_page_segment()
+            current_page_number = pdf_page_number
+
+        current_lines.append(line)
+        current_page_lines.append(line)
+        current_end_page = pdf_page_number
 
     def save_current_unit() -> None:
         if (
@@ -81,14 +125,17 @@ def parse_document(document: ExtractedDocument) -> ParsedDocument:
         ):
             return
 
+        save_page_segment()
+
         units.append(
             ParsedUnit(
                 kind=current_kind,
                 identifier=current_identifier,
                 title=current_title,
+                text="\n".join(current_lines).strip(),
                 start_pdf_page=current_start_page,
                 end_pdf_page=current_end_page,
-                text="\n".join(current_lines).strip(),
+                page_segments=current_page_segments.copy(),
             )
         )
 
@@ -106,6 +153,10 @@ def parse_document(document: ExtractedDocument) -> ParsedDocument:
             parsing_started = True
             lines = lines[first_content_line:]
 
+        if not lines and current_kind is not None:
+            current_end_page = page.pdf_page_number
+            continue
+
         for line in lines:
             heading = get_heading(line)
 
@@ -120,8 +171,12 @@ def parse_document(document: ExtractedDocument) -> ParsedDocument:
 
                 if is_repeated_appendix:
                     if current_kind is not None:
-                        current_lines.append(line)
-                        current_end_page = page.pdf_page_number
+                        append_line(line, page.pdf_page_number)
+                    continue
+
+                # Future-year appendices can quote ARTICLE headings.
+                if current_kind == "appendix" and kind == "article":
+                    append_line(line, page.pdf_page_number)
                     continue
 
                 save_current_unit()
@@ -131,7 +186,10 @@ def parse_document(document: ExtractedDocument) -> ParsedDocument:
                 current_title = title
                 current_start_page = page.pdf_page_number
                 current_end_page = page.pdf_page_number
-                current_lines = [line]
+                current_lines = []
+                current_page_segments = []
+
+                append_line(line, page.pdf_page_number)
 
                 if kind == "appendix" and identifier is not None:
                     seen_appendix_identifiers.add(identifier)
@@ -139,8 +197,7 @@ def parse_document(document: ExtractedDocument) -> ParsedDocument:
                 continue
 
             if current_kind is not None:
-                current_lines.append(line)
-                current_end_page = page.pdf_page_number
+                append_line(line, page.pdf_page_number)
 
     save_current_unit()
 

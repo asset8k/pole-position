@@ -25,7 +25,21 @@ def is_running_header(line: str) -> bool:
 def normalize_page_text(raw_text: str) -> str:
     normalized_lines: list[str] = []
 
-    for raw_line in raw_text.splitlines():
+    raw_lines = raw_text.splitlines()
+
+    for index in range(len(raw_lines) - 1):
+        if (
+            raw_lines[index].strip() == "0"
+            and re.fullmatch(r"[A-F]", raw_lines[index + 1].strip())
+            and all(
+                not previous.strip() or is_running_header(previous.strip())
+                for previous in raw_lines[:index]
+            )
+        ):
+            del raw_lines[index : index + 2]
+            break
+
+    for raw_line in raw_lines:
         line = raw_line.strip()
 
         if is_running_header(line):

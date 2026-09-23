@@ -1,6 +1,10 @@
 import pytest
 
-from pole_position.rag.contracts import ParsedClause, ParsedClauseDocument
+from pole_position.rag.contracts import (
+    PageTextSegment,
+    ParsedClause,
+    ParsedClauseDocument,
+)
 from pole_position.rag.ingestion.clause_chunker import chunk_clauses
 
 SOURCE_SHA256 = "a" * 64
@@ -11,14 +15,22 @@ def make_clause(
     *,
     clause_identifier: str = "A1.2.3",
     text: str = "The clause text used for retrieval.",
+    page_texts: tuple[str, ...] | None = None,
 ) -> ParsedClause:
+    if page_texts is None:
+        page_texts = (text,)
+
     return ParsedClause(
         article_identifier="A1",
         clause_identifier=clause_identifier,
         title="Applicable regulations",
-        text=text,
+        text="\n".join(page_texts),
         start_pdf_page=5,
-        end_pdf_page=6,
+        end_pdf_page=5 + len(page_texts) - 1,
+        page_segments=[
+            PageTextSegment(pdf_page_number=5 + index, text=page_text)
+            for index, page_text in enumerate(page_texts)
+        ],
     )
 
 
@@ -42,13 +54,36 @@ def test_chunk_clauses_preserves_short_clause_provenance() -> None:
     chunk = chunked_document.chunks[0]
     assert chunk.chunk_id == f"{DOCUMENT_ID}:A1.2.3:0"
     assert chunk.section == "A"
+    assert chunk.source_kind == "clause"
     assert chunk.article_identifier == "A1"
     assert chunk.clause_identifier == "A1.2.3"
     assert chunk.clause_title == "Applicable regulations"
     assert chunk.chunk_index == 0
     assert chunk.text == clause.text
     assert chunk.start_pdf_page == 5
-    assert chunk.end_pdf_page == 6
+    assert chunk.end_pdf_page == 5
+
+
+def test_chunk_clauses_keeps_multi_page_clause_chunks_on_their_source_pages() -> None:
+    clause = make_clause(
+        page_texts=("First page rule.", "Second page continuation."),
+    )
+
+    chunks = chunk_clauses(make_document([clause])).chunks
+
+    assert [chunk.text for chunk in chunks] == [
+        "First page rule.",
+        "Second page continuation.",
+    ]
+    assert [chunk.chunk_index for chunk in chunks] == [0, 1]
+    assert [chunk.chunk_id for chunk in chunks] == [
+        f"{DOCUMENT_ID}:A1.2.3:0",
+        f"{DOCUMENT_ID}:A1.2.3:1",
+    ]
+    assert [(chunk.start_pdf_page, chunk.end_pdf_page) for chunk in chunks] == [
+        (5, 5),
+        (6, 6),
+    ]
 
 
 def test_chunk_clauses_splits_long_clause_with_sequential_chunk_indexes() -> None:

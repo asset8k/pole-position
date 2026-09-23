@@ -132,28 +132,33 @@ def chunk_clauses(
     chunks: list[RetrievalChunk] = []
 
     for clause in document.clauses:
-        clause_chunks = split_clause_text(clause.text, max_characters)
+        chunk_index = 0
 
-        for chunk_index, chunk_text in enumerate(clause_chunks):
-            chunks.append(
-                RetrievalChunk(
-                    chunk_id=(
-                        f"{document.document_id}:"
-                        f"{clause.clause_identifier}:"
-                        f"{chunk_index}"
-                    ),
-                    document_id=document.document_id,
-                    source_sha256=document.source_sha256,
-                    section=cast(RegulationSection, clause.article_identifier[0]),
-                    article_identifier=clause.article_identifier,
-                    clause_identifier=clause.clause_identifier,
-                    clause_title=clause.title,
-                    chunk_index=chunk_index,
-                    text=chunk_text,
-                    start_pdf_page=clause.start_pdf_page,
-                    end_pdf_page=clause.end_pdf_page,
+        for page_segment in clause.page_segments:
+            page_chunks = split_clause_text(page_segment.text, max_characters)
+
+            for chunk_text in page_chunks:
+                chunks.append(
+                    RetrievalChunk(
+                        chunk_id=(
+                            f"{document.document_id}:"
+                            f"{clause.clause_identifier}:"
+                            f"{chunk_index}"
+                        ),
+                        document_id=document.document_id,
+                        source_sha256=document.source_sha256,
+                        section=cast(RegulationSection, clause.article_identifier[0]),
+                        source_kind="clause",
+                        article_identifier=clause.article_identifier,
+                        clause_identifier=clause.clause_identifier,
+                        clause_title=clause.title,
+                        chunk_index=chunk_index,
+                        text=chunk_text,
+                        start_pdf_page=page_segment.pdf_page_number,
+                        end_pdf_page=page_segment.pdf_page_number,
+                    )
                 )
-            )
+                chunk_index += 1
 
     return ChunkedDocument(
         document_id=document.document_id,

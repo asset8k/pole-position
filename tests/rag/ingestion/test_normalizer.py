@@ -59,6 +59,17 @@ Overview"""
     )
 
 
+def test_normalize_page_text_removes_split_page_marker_only_at_start() -> None:
+    heading = "ARTICLE D1: GENERAL PRINCIPLES"
+
+    assert normalize_page_text(f"0\nD\n{heading}\nD1.1\nScope") == (
+        f"{heading}\nD1.1\nScope"
+    )
+    assert normalize_page_text(f"{heading}\n0\nD\nD1.1\nScope") == (
+        f"{heading}\n0\nD\nD1.1\nScope"
+    )
+
+
 def test_normalize_document_preserves_metadata_and_page_numbers() -> None:
     document = ExtractedDocument(
         document_id="fia-f1-2026-section-a-issue-03",

@@ -2,6 +2,7 @@ import re
 
 from pole_position.rag.contracts import (
     ExtractedDocument,
+    PageTextSegment,
     ParsedClause,
     ParsedClauseDocument,
 )
@@ -11,6 +12,14 @@ from pole_position.rag.ingestion.structure_parser import (
 )
 
 CLAUSE_HEADING_PATTERN = re.compile(r"^(?P<identifier>[A-F]\d+(?:\.\d+)+)$")
+
+
+def looks_like_table_reference(lines: list[str], index: int) -> bool:
+    following = [
+        line.strip().casefold() for line in lines[index + 1 :] if line.strip()
+    ][:8]
+
+    return sum(line in {"yes", "no"} for line in following) >= 2
 
 
 def get_clause_identifier(line: str) -> str | None:
@@ -74,9 +83,40 @@ def parse_clauses(document: ExtractedDocument) -> ParsedClauseDocument:
     current_start_page: int | None = None
     current_end_page: int | None = None
     current_lines: list[str] = []
+    current_page_number: int | None = None
+    current_page_lines: list[str] = []
+    current_page_segments: list[PageTextSegment] = []
 
     parsing_started = False
     reached_appendices = False
+
+    def save_page_segment() -> None:
+        nonlocal current_page_number, current_page_lines
+
+        if current_page_number is not None:
+            text = "\n".join(current_page_lines).strip()
+
+            if text:
+                current_page_segments.append(
+                    PageTextSegment(
+                        pdf_page_number=current_page_number,
+                        text=text,
+                    )
+                )
+
+        current_page_number = None
+        current_page_lines = []
+
+    def add_clause_line(line: str, pdf_page_number: int) -> None:
+        nonlocal current_page_number, current_end_page
+
+        if current_page_number != pdf_page_number:
+            save_page_segment()
+            current_page_number = pdf_page_number
+
+        current_lines.append(line)
+        current_page_lines.append(line)
+        current_end_page = pdf_page_number
 
     def save_current_clause() -> None:
         if (
@@ -87,6 +127,8 @@ def parse_clauses(document: ExtractedDocument) -> ParsedClauseDocument:
         ):
             return
 
+        save_page_segment()
+
         clauses.append(
             ParsedClause(
                 article_identifier=current_article_identifier,
@@ -95,6 +137,7 @@ def parse_clauses(document: ExtractedDocument) -> ParsedClauseDocument:
                 text="\n".join(current_lines).strip(),
                 start_pdf_page=current_start_page,
                 end_pdf_page=current_end_page,
+                page_segments=current_page_segments.copy(),
             )
         )
 
@@ -144,6 +187,7 @@ def parse_clauses(document: ExtractedDocument) -> ParsedClauseDocument:
                 clause_identifier is not None
                 and current_article_identifier is not None
                 and clause_identifier.startswith(f"{current_article_identifier}.")
+                and not looks_like_table_reference(lines, line_index)
             ):
                 save_current_clause()
 
@@ -153,12 +197,16 @@ def parse_clauses(document: ExtractedDocument) -> ParsedClauseDocument:
                 current_clause_title = None
                 current_start_page = page.pdf_page_number
                 current_end_page = page.pdf_page_number
-                current_lines = [line]
+                current_lines = []
+                current_page_number = None
+                current_page_lines = []
+                current_page_segments = []
+                add_clause_line(line, page.pdf_page_number)
 
                 if title_match is not None:
                     title_index, title = title_match
                     current_clause_title = title
-                    current_lines.append(title)
+                    add_clause_line(title, page.pdf_page_number)
                     line_index = title_index + 1
                     continue
 
@@ -166,8 +214,7 @@ def parse_clauses(document: ExtractedDocument) -> ParsedClauseDocument:
                 continue
 
             if current_clause_identifier is not None:
-                current_lines.append(line)
-                current_end_page = page.pdf_page_number
+                add_clause_line(line, page.pdf_page_number)
 
             line_index += 1
 
