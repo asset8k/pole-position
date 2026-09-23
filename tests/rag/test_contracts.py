@@ -35,6 +35,69 @@ def test_retrieval_chunk_accepts_valid_provenance() -> None:
     assert chunk.chunk_index == 0
 
 
+def test_retrieval_chunk_accepts_appendix_provenance() -> None:
+    chunk = make_chunk(
+        source_kind="appendix",
+        article_identifier=None,
+        clause_identifier=None,
+        appendix_identifier="A1",
+        appendix_title="DEFINITIONS",
+    )
+
+    assert chunk.source_kind == "appendix"
+    assert chunk.appendix_identifier == "A1"
+    assert chunk.article_identifier is None
+    assert chunk.clause_identifier is None
+
+
+def make_preamble_chunk(**overrides: object) -> RetrievalChunk:
+    values: dict[str, object] = {
+        "chunk_id": "fia-f1-2026-section-a-issue-03:preamble:page-4:0",
+        "source_kind": "preamble",
+        "article_identifier": None,
+        "clause_identifier": None,
+        "start_pdf_page": 4,
+        "end_pdf_page": 4,
+    }
+    values.update(overrides)
+    return make_chunk(**values)
+
+
+def test_retrieval_chunk_accepts_preamble_provenance() -> None:
+    chunk = make_preamble_chunk()
+
+    assert chunk.source_kind == "preamble"
+    assert chunk.start_pdf_page == chunk.end_pdf_page == 4
+    assert chunk.article_identifier is None
+    assert chunk.clause_identifier is None
+    assert chunk.appendix_identifier is None
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"article_identifier": "A1"},
+        {"appendix_identifier": "A1"},
+    ],
+)
+def test_retrieval_chunk_rejects_preamble_with_other_source_metadata(
+    overrides: dict[str, object],
+) -> None:
+    with pytest.raises(
+        ValidationError,
+        match="Preamble chunk cannot contain clause or appendix metadata",
+    ):
+        make_preamble_chunk(**overrides)
+
+
+def test_retrieval_chunk_rejects_multi_page_preamble() -> None:
+    with pytest.raises(
+        ValidationError,
+        match="Preamble chunk must cite one PDF page",
+    ):
+        make_preamble_chunk(end_pdf_page=5)
+
+
 @pytest.mark.parametrize(
     ("overrides", "message"),
     [

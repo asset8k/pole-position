@@ -9,6 +9,7 @@ from pole_position.rag.ingestion.clause_chunker import chunk_clauses
 from pole_position.rag.ingestion.clause_parser import parse_clauses
 from pole_position.rag.ingestion.normalizer import normalize_document
 from pole_position.rag.ingestion.pdf_extractor import extract_pdf
+from pole_position.rag.ingestion.preamble_chunker import chunk_preamble
 from pole_position.rag.ingestion.structure_parser import parse_document
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -92,10 +93,15 @@ def main() -> None:
         section_document.section,
     )
 
+    preamble_chunks = chunk_preamble(
+        parsed_document,
+        section_document.section,
+    )
+
     chunked_document = ChunkedDocument(
         document_id=section_document.document_id,
         source_sha256=parsed_document.source_sha256,
-        chunks=[*chunked_clauses.chunks, *appendix_chunks],
+        chunks=[*chunked_clauses.chunks, *appendix_chunks, *preamble_chunks],
     )
 
     chunks_directory = PROJECT_ROOT / "artifacts/chunks"
@@ -110,7 +116,8 @@ def main() -> None:
     print(
         f"Created {len(chunked_document.chunks)} chunks "
         f"({len(chunked_clauses.chunks)} clause, "
-        f"{len(appendix_chunks)} appendix) at {chunks_path}"
+        f"{len(appendix_chunks)} appendix, "
+        f"{len(preamble_chunks)} preamble) at {chunks_path}"
     )
     print(f"Skipped future-year appendices: {skipped_future}")
     print(f"Skipped visual-only appendices: {skipped_visual}")

@@ -113,7 +113,7 @@ class RetrievalChunk(BaseModel):
     source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     section: RegulationSection
 
-    source_kind: Literal["clause", "appendix"]
+    source_kind: Literal["clause", "appendix", "preamble"]
 
     article_identifier: str | None = Field(default=None, pattern=r"^[A-F]\d+$")
     clause_identifier: str | None = Field(default=None, pattern=r"^[A-F]\d+(?:\.\d+)+$")
@@ -145,7 +145,7 @@ class RetrievalChunk(BaseModel):
             if not self.clause_identifier.startswith(f"{self.article_identifier}."):
                 raise ValueError("Clause identifier must belong to its parent Article")
 
-        else:
+        elif self.source_kind == "appendix":
             if self.appendix_identifier is None:
                 raise ValueError("Appendix chunk requires an appendix identifier")
 
@@ -158,6 +158,24 @@ class RetrievalChunk(BaseModel):
 
             if not self.appendix_identifier.startswith(self.section):
                 raise ValueError("Appendix identifier must belong to its Section")
+
+        else:  # preamble
+            if any(
+                value is not None
+                for value in (
+                    self.article_identifier,
+                    self.clause_identifier,
+                    self.clause_title,
+                    self.appendix_identifier,
+                    self.appendix_title,
+                )
+            ):
+                raise ValueError(
+                    "Preamble chunk cannot contain clause or appendix metadata"
+                )
+
+            if self.start_pdf_page != self.end_pdf_page:
+                raise ValueError("Preamble chunk must cite one PDF page")
 
         return self
 
