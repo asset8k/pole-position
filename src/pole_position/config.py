@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
     openai_api_key: SecretStr
+    qdrant_url: str
+    qdrant_api_key: SecretStr
+    qdrant_collection: str = "fia_regulations"
 
 
 settings = Settings()  # type: ignore[call-arg] # Loaded from .env file
