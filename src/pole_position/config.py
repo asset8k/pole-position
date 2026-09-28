@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
     openai_api_key: SecretStr
+    answer_model: str = "gpt-6-luna"
     qdrant_url: str
     qdrant_api_key: SecretStr
     qdrant_collection: str = "fia_regulations"
