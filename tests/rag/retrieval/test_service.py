@@ -7,7 +7,9 @@ from qdrant_client import QdrantClient
 from pole_position.rag.contracts import RetrievalChunk
 from pole_position.rag.generation.prompts import INSUFFICIENT_EVIDENCE_ANSWER
 from pole_position.rag.retrieval.dense import DenseHit
+from pole_position.rag.retrieval.fusion import FusedHit
 from pole_position.rag.retrieval.service import answer_question
+from pole_position.rag.retrieval.sparse import SparseCorpus, SparseHit
 
 
 def make_hit(clause_identifier: str, page: int) -> DenseHit:
@@ -78,6 +80,129 @@ def test_answer_question_orchestrates_retrieval_generation_and_citations() -> No
     ]
     openai_client.responses.create.assert_not_called()
     qdrant_client.query_points.assert_not_called()
+
+
+def test_answer_question_fuses_overlapping_hits_and_cites_fused_sources() -> None:
+    openai_client = Mock(spec=OpenAI)
+    qdrant_client = Mock(spec=QdrantClient)
+    sparse_corpus = Mock(spec=SparseCorpus)
+    dense_only = make_hit("B8.2.2", 66)
+    shared = make_hit("B8.2.8", 67)
+    sparse_only = make_hit("B8.2.3", 67)
+    sparse_hits = [
+        SparseHit(shared.chunk, 12.0, shared.document_title),
+        SparseHit(sparse_only.chunk, 8.0, sparse_only.document_title),
+    ]
+    question = "What happens if a driver exceeds the allocation?"
+    draft = "There is a penalty [S1]. The allocation is specified elsewhere [S3]."
+
+    with (
+        patch(
+            "pole_position.rag.retrieval.service.retrieve_dense",
+            return_value=[dense_only, shared],
+        ) as retrieve_dense_mock,
+        patch(
+            "pole_position.rag.retrieval.service.retrieve_sparse",
+            return_value=sparse_hits,
+        ) as retrieve_sparse_mock,
+        patch(
+            "pole_position.rag.retrieval.service.generate_draft_answer",
+            return_value=draft,
+        ) as generate_mock,
+    ):
+        result = answer_question(
+            question,
+            openai_client=openai_client,
+            qdrant_client=qdrant_client,
+            collection_name="fia_regulations",
+            model="test-model",
+            sparse_corpus=sparse_corpus,
+            top_k=3,
+            section="B",
+        )
+
+    retrieve_dense_mock.assert_called_once_with(
+        question,
+        openai_client=openai_client,
+        qdrant_client=qdrant_client,
+        collection_name="fia_regulations",
+        top_k=20,
+        section="B",
+    )
+    retrieve_sparse_mock.assert_called_once_with(
+        question,
+        corpus=sparse_corpus,
+        top_k=20,
+        section="B",
+    )
+    context = generate_mock.call_args.args[1]
+    assert [hit.chunk.chunk_id for hit in context.sources.values()] == [
+        shared.chunk.chunk_id,
+        dense_only.chunk.chunk_id,
+        sparse_only.chunk.chunk_id,
+    ]
+    assert context.text.count("Regulation text for B8.2.8.") == 1
+    assert [citation.source_id for citation in result.citations] == ["S1", "S3"]
+    assert result.answer == draft
+
+    shared_citation, sparse_citation = result.citations
+    assert isinstance(shared_citation.hit, FusedHit)
+    assert shared_citation.hit is context.sources["S1"]
+    assert shared_citation.hit.dense_rank == 2
+    assert shared_citation.hit.sparse_rank == 1
+    assert sparse_citation.hit is context.sources["S3"]
+    assert sparse_citation.hit.chunk == sparse_only.chunk
+    assert sparse_citation.hit.dense_rank is None
+    assert sparse_citation.hit.sparse_rank == 2
+
+
+def test_answer_question_can_cite_sparse_only_hit_when_dense_finds_nothing() -> None:
+    sparse_corpus = Mock(spec=SparseCorpus)
+    sparse_only = make_hit("B8.2.8", 67)
+    question = "What is the penalty under B8.2.8?"
+    draft = "The clause provides the answer [S1]."
+
+    with (
+        patch(
+            "pole_position.rag.retrieval.service.retrieve_dense",
+            return_value=[],
+        ) as retrieve_dense_mock,
+        patch(
+            "pole_position.rag.retrieval.service.retrieve_sparse",
+            return_value=[
+                SparseHit(sparse_only.chunk, 10.0, sparse_only.document_title)
+            ],
+        ) as retrieve_sparse_mock,
+        patch(
+            "pole_position.rag.retrieval.service.generate_draft_answer",
+            return_value=draft,
+        ) as generate_mock,
+    ):
+        result = answer_question(
+            question,
+            openai_client=Mock(spec=OpenAI),
+            qdrant_client=Mock(spec=QdrantClient),
+            collection_name="fia_regulations",
+            model="test-model",
+            sparse_corpus=sparse_corpus,
+        )
+
+    retrieve_dense_mock.assert_called_once()
+    retrieve_sparse_mock.assert_called_once_with(
+        question,
+        corpus=sparse_corpus,
+        top_k=20,
+        section=None,
+    )
+    context = generate_mock.call_args.args[1]
+    assert list(context.sources) == ["S1"]
+    assert result.answer == draft
+    assert len(result.citations) == 1
+    assert result.citations[0].hit is context.sources["S1"]
+    assert isinstance(result.citations[0].hit, FusedHit)
+    assert result.citations[0].hit.chunk == sparse_only.chunk
+    assert result.citations[0].hit.dense_rank is None
+    assert result.citations[0].hit.sparse_rank == 1
 
 
 def test_answer_question_abstains_without_hits_or_generation_api_call() -> None:

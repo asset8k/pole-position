@@ -1,11 +1,10 @@
 import re
 from dataclasses import dataclass
 
-from pole_position.rag.generation.context_builder import ContextBundle
+from pole_position.rag.generation.context_builder import ContextBundle, EvidenceHit
 from pole_position.rag.generation.prompts import (
     INSUFFICIENT_EVIDENCE_ANSWER,
 )
-from pole_position.rag.retrieval.dense import DenseHit
 
 CITATION_PATTERN = re.compile(r"\[S[^\]\n]*\]")
 VALID_SOURCE_ID = re.compile(r"S[1-9]\d*")
@@ -18,7 +17,7 @@ class CitationValidationError(ValueError):
 @dataclass(frozen=True)
 class ValidatedCitation:
     source_id: str
-    hit: DenseHit
+    hit: EvidenceHit
 
 
 @dataclass(frozen=True)

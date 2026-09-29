@@ -11,6 +11,8 @@ from pole_position.rag.generation.prompts import (
     INSUFFICIENT_EVIDENCE_ANSWER,
 )
 from pole_position.rag.retrieval.dense import DenseHit
+from pole_position.rag.retrieval.fusion import FusedHit, fuse_hits
+from pole_position.rag.retrieval.sparse import SparseHit
 
 DOCUMENT_ID = "fia-f1-2026-section-b-issue-08"
 SOURCE_SHA256 = "a" * 64
@@ -50,6 +52,29 @@ def test_validate_citations_returns_only_used_sources_in_first_mention_order(
     assert validated.citations[0].hit is context.sources["S2"]
     assert validated.citations[1].hit is context.sources["S1"]
     assert validated.citations[1].hit.chunk.start_pdf_page == 67
+
+
+def test_fused_hit_survives_context_building_and_citation_validation() -> None:
+    dense_hit = make_hit("B8.2.8", 67)
+    sparse_hit = SparseHit(
+        chunk=dense_hit.chunk,
+        score=12.0,
+        document_title=dense_hit.document_title,
+    )
+    fused_hit = fuse_hits([dense_hit], [sparse_hit])[0]
+
+    context = build_context([fused_hit])
+    validated = validate_citations("The allocation has a penalty [S1].", context)
+
+    assert isinstance(fused_hit, FusedHit)
+    assert "Location: Clause B8.2.8 (Article B8)" in context.text
+    assert "PDF page(s): 67" in context.text
+    assert context.sources["S1"] is fused_hit
+    assert len(validated.citations) == 1
+    assert validated.citations[0].source_id == "S1"
+    assert validated.citations[0].hit is fused_hit
+    assert validated.citations[0].hit.chunk.chunk_id == dense_hit.chunk.chunk_id
+    assert fused_hit.dense_rank == fused_hit.sparse_rank == 1
 
 
 def test_validate_citations_accepts_one_valid_source(context: ContextBundle) -> None:

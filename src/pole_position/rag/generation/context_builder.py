@@ -1,9 +1,20 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Protocol
 
-from pole_position.rag.retrieval.dense import DenseHit
+from pole_position.rag.contracts import RetrievalChunk
 
 DEFAULT_MAX_CONTEXT_CHARS = 12_000
+
+
+class EvidenceHit(Protocol):
+    """The fields context building needs from any retrieval hit."""
+
+    @property
+    def chunk(self) -> RetrievalChunk: ...
+
+    @property
+    def document_title(self) -> str: ...
 
 
 @dataclass(frozen=True)
@@ -11,10 +22,10 @@ class ContextBundle:
     """Prompt-ready evidence and the hits behind its citation labels."""
 
     text: str
-    sources: dict[str, DenseHit]
+    sources: dict[str, EvidenceHit]
 
 
-def _location(hit: DenseHit) -> str:
+def _location(hit: EvidenceHit) -> str:
     chunk = hit.chunk
     if chunk.source_kind == "clause":
         return f"Clause {chunk.clause_identifier} (Article {chunk.article_identifier})"
@@ -23,13 +34,13 @@ def _location(hit: DenseHit) -> str:
     return "Preamble"
 
 
-def _page_label(hit: DenseHit) -> str:
+def _page_label(hit: EvidenceHit) -> str:
     start = hit.chunk.start_pdf_page
     end = hit.chunk.end_pdf_page
     return str(start) if start == end else f"{start}-{end}"
 
 
-def _format_source(source_id: str, hit: DenseHit) -> str:
+def _format_source(source_id: str, hit: EvidenceHit) -> str:
     chunk = hit.chunk
     return (
         f"[{source_id}]\n"
@@ -43,7 +54,7 @@ def _format_source(source_id: str, hit: DenseHit) -> str:
 
 
 def build_context(
-    hits: Sequence[DenseHit],
+    hits: Sequence[EvidenceHit],
     *,
     max_chars: int = DEFAULT_MAX_CONTEXT_CHARS,
 ) -> ContextBundle:
@@ -55,7 +66,7 @@ def build_context(
         raise ValueError("max_chars must be positive")
 
     blocks: list[str] = []
-    sources: dict[str, DenseHit] = {}
+    sources: dict[str, EvidenceHit] = {}
     seen_chunk_ids: set[str] = set()
     used_chars = 0
 
