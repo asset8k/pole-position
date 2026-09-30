@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from unittest.mock import Mock, patch
 
 import pytest
@@ -203,6 +204,148 @@ def test_answer_question_can_cite_sparse_only_hit_when_dense_finds_nothing() -> 
     assert result.citations[0].hit.chunk == sparse_only.chunk
     assert result.citations[0].hit.dense_rank is None
     assert result.citations[0].hit.sparse_rank == 1
+
+
+def test_answer_question_reranks_twenty_fused_candidates_before_context() -> None:
+    question = "Which Power Unit rule applies?"
+    openai_client = Mock(spec=OpenAI)
+    qdrant_client = Mock(spec=QdrantClient)
+    sparse_corpus = Mock(spec=SparseCorpus)
+    dense_hits = [make_hit(f"B8.2.{number}", 67) for number in range(1, 21)]
+    sparse_hits = [
+        SparseHit(hit.chunk, 10.0, hit.document_title) for hit in dense_hits
+    ]
+    draft = "The first selected rule applies [S1], with support from [S5]."
+
+    def select_last_five(
+        _question: str,
+        candidates: Sequence[FusedHit],
+        **_kwargs: object,
+    ) -> list[FusedHit]:
+        return list(reversed(candidates[-5:]))
+
+    with (
+        patch(
+            "pole_position.rag.retrieval.service.retrieve_dense",
+            return_value=dense_hits,
+        ) as retrieve_dense_mock,
+        patch(
+            "pole_position.rag.retrieval.service.retrieve_sparse",
+            return_value=sparse_hits,
+        ) as retrieve_sparse_mock,
+        patch(
+            "pole_position.rag.retrieval.service.rerank_hits",
+            side_effect=select_last_five,
+        ) as rerank_mock,
+        patch(
+            "pole_position.rag.retrieval.service.generate_draft_answer",
+            return_value=draft,
+        ) as generate_mock,
+    ):
+        result = answer_question(
+            question,
+            openai_client=openai_client,
+            qdrant_client=qdrant_client,
+            collection_name="fia_regulations",
+            model="answer-model",
+            sparse_corpus=sparse_corpus,
+            rerank_model="rerank-model",
+            top_k=5,
+            section="B",
+        )
+
+    retrieve_dense_mock.assert_called_once_with(
+        question,
+        openai_client=openai_client,
+        qdrant_client=qdrant_client,
+        collection_name="fia_regulations",
+        top_k=20,
+        section="B",
+    )
+    retrieve_sparse_mock.assert_called_once_with(
+        question,
+        corpus=sparse_corpus,
+        top_k=20,
+        section="B",
+    )
+    rerank_mock.assert_called_once()
+    rerank_args, rerank_kwargs = rerank_mock.call_args
+    assert rerank_args[0] == question
+    fused_candidates = rerank_args[1]
+    assert len(fused_candidates) == 20
+    assert all(isinstance(hit, FusedHit) for hit in fused_candidates)
+    assert [hit.chunk.chunk_id for hit in fused_candidates] == [
+        hit.chunk.chunk_id for hit in dense_hits
+    ]
+    assert [hit.dense_rank for hit in fused_candidates] == list(range(1, 21))
+    assert [hit.sparse_rank for hit in fused_candidates] == list(range(1, 21))
+    assert rerank_kwargs == {
+        "client": openai_client,
+        "model": "rerank-model",
+        "top_k": 5,
+    }
+
+    generate_mock.assert_called_once()
+    context = generate_mock.call_args.args[1]
+    assert [hit.chunk.chunk_id for hit in context.sources.values()] == [
+        hit.chunk.chunk_id for hit in reversed(dense_hits[-5:])
+    ]
+    assert len(context.sources) == 5
+    assert len(result.citations) == 2
+    assert result.citations[0].hit is context.sources["S1"]
+    assert result.citations[1].hit is context.sources["S5"]
+    assert result.answer == draft
+    openai_client.responses.parse.assert_not_called()
+    qdrant_client.query_points.assert_not_called()
+
+
+def test_answer_question_uses_fused_hits_if_reranking_fails(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    dense_hits = [make_hit(f"B8.2.{number}", 67) for number in range(1, 7)]
+    sparse_hits = [
+        SparseHit(hit.chunk, 10.0, hit.document_title) for hit in dense_hits
+    ]
+    draft = "The rule is stated here [S1]."
+
+    with (
+        patch(
+            "pole_position.rag.retrieval.service.retrieve_dense",
+            return_value=dense_hits,
+        ),
+        patch(
+            "pole_position.rag.retrieval.service.retrieve_sparse",
+            return_value=sparse_hits,
+        ),
+        patch(
+            "pole_position.rag.retrieval.service.rerank_hits",
+            side_effect=RuntimeError("Model unavailable"),
+        ) as rerank_mock,
+        patch(
+            "pole_position.rag.retrieval.service.generate_draft_answer",
+            return_value=draft,
+        ) as generate_mock,
+    ):
+        result = answer_question(
+            "Which Power Unit rule applies?",
+            openai_client=Mock(spec=OpenAI),
+            qdrant_client=Mock(spec=QdrantClient),
+            collection_name="fia_regulations",
+            model="answer-model",
+            sparse_corpus=Mock(spec=SparseCorpus),
+            rerank_model="rerank-model",
+            top_k=5,
+        )
+
+    rerank_mock.assert_called_once()
+    context = generate_mock.call_args.args[1]
+    assert [hit.chunk.chunk_id for hit in context.sources.values()] == [
+        hit.chunk.chunk_id for hit in dense_hits[:5]
+    ]
+    assert result.answer == draft
+    assert len(result.citations) == 1
+    assert result.citations[0].hit is context.sources["S1"]
+    assert "Reranking failed; using fused results" in caplog.text
 
 
 def test_answer_question_abstains_without_hits_or_generation_api_call() -> None:

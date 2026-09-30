@@ -19,10 +19,11 @@ from pole_position.rag.generation.context_builder import (
 from pole_position.rag.generation.prompts import INSUFFICIENT_EVIDENCE_ANSWER
 from pole_position.rag.retrieval.dense import retrieve_dense
 from pole_position.rag.retrieval.fusion import fuse_hits
-from pole_position.rag.retrieval.sparse import (
-    SparseCorpus,
-    retrieve_sparse,
+from pole_position.rag.retrieval.reranker import (
+    MAX_RERANK_CANDIDATES,
+    rerank_hits,
 )
+from pole_position.rag.retrieval.sparse import SparseCorpus, retrieve_sparse
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ def answer_question(
     collection_name: str,
     model: str,
     sparse_corpus: SparseCorpus | None = None,
+    rerank_model: str | None = None,
     top_k: int = 5,
     section: RegulationSection | None = None,
     max_context_chars: int = DEFAULT_MAX_CONTEXT_CHARS,
@@ -52,8 +54,16 @@ def answer_question(
     if max_context_chars <= 0:
         raise ValueError("max_context_chars must be positive")
 
-    # Hybrid search needs more candidates from each method than the number
-    # ultimately sent to the answer generator.
+    if rerank_model is not None:
+        if not rerank_model.strip():
+            raise ValueError("Rerank model cannot be empty")
+        if sparse_corpus is None:
+            raise ValueError("Reranking requires a sparse corpus")
+        if top_k > MAX_RERANK_CANDIDATES:
+            raise ValueError(
+                f"Reranking supports at most {MAX_RERANK_CANDIDATES} final hits"
+            )
+
     candidate_k = max(20, top_k) if sparse_corpus is not None else top_k
 
     dense_hits = retrieve_dense(
@@ -74,7 +84,29 @@ def answer_question(
             top_k=candidate_k,
             section=section,
         )
-        hits = fuse_hits(dense_hits, sparse_hits, top_k=top_k)
+
+        # Without reranking, fusion selects the final hits immediately.
+        # With reranking, retain the larger candidate pool.
+        fused_hits = fuse_hits(
+            dense_hits,
+            sparse_hits,
+            top_k=candidate_k if rerank_model is not None else top_k,
+        )
+
+        if rerank_model is not None:
+            try:
+                hits = rerank_hits(
+                    question,
+                    fused_hits,
+                    client=openai_client,
+                    model=rerank_model,
+                    top_k=top_k,
+                )
+            except Exception:
+                logger.warning("Reranking failed; using fused results", exc_info=True)
+                hits = fused_hits[:top_k]
+        else:
+            hits = fused_hits
 
     context = build_context(hits, max_chars=max_context_chars)
 

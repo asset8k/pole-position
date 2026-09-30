@@ -64,7 +64,9 @@ def make_answer() -> ValidatedAnswer:
 
 def test_chat_returns_grounded_answer_and_citation(
     client: tuple[TestClient, Mock, Mock, Mock],
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setattr(settings, "rerank_enabled", True)
     test_client, openai_client, qdrant_client, sparse_corpus = client
     answer = make_answer()
 
@@ -83,6 +85,7 @@ def test_chat_returns_grounded_answer_and_citation(
         collection_name=settings.qdrant_collection,
         model=settings.answer_model,
         sparse_corpus=sparse_corpus,
+        rerank_model=settings.answer_model,
     )
     assert response.json() == {
         "answer": answer.answer,
@@ -106,6 +109,23 @@ def test_chat_returns_grounded_answer_and_citation(
         ],
         "conversation_id": None,
     }
+
+
+def test_chat_can_disable_reranking(
+    client: tuple[TestClient, Mock, Mock, Mock],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(settings, "rerank_enabled", False)
+    test_client, _, _, _ = client
+
+    with patch(
+        "pole_position.chat.router.answer_question",
+        return_value=make_answer(),
+    ) as answer_mock:
+        response = test_client.post("/api/chat", json={"message": "What is the penalty?"})
+
+    assert response.status_code == 200
+    assert answer_mock.call_args.kwargs["rerank_model"] is None
 
 
 def test_chat_returns_uncited_abstention(

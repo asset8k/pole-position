@@ -61,6 +61,7 @@ def chat(
         collection_name=settings.qdrant_collection,
         model=settings.answer_model,
         sparse_corpus=sparse_corpus,
+        rerank_model=settings.answer_model if settings.rerank_enabled else None,
     )
 
     citations: list[Citation] = []
