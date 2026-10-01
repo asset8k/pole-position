@@ -24,6 +24,7 @@ from pole_position.auth.dependencies import (
 )
 from pole_position.chat import service as chat_service
 from pole_position.chat.schemas import (
+    ChatHistoryMessage,
     ChatRequest,
     ChatResponse,
     Citation,
@@ -72,6 +73,44 @@ def get_sparse_corpus() -> SparseCorpus:
     )
 
 
+async def get_request_history(
+    request: ChatRequest,
+    *,
+    db: AsyncSession,
+    current_user: User | None,
+) -> list[ChatHistoryMessage]:
+    """Use client history for guests and trusted database history for users."""
+    if current_user is None and request.conversation_id is not None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required to access saved conversations",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if current_user is None:
+        return list(request.history)
+
+    if request.history:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Authenticated requests must omit client-supplied history",
+        )
+    if request.conversation_id is not None:
+        history = await chat_service.get_recent_history(
+            db,
+            user_id=current_user.id,
+            conversation_id=request.conversation_id,
+        )
+        if history is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Conversation not found",
+            )
+        return history
+
+    return []
+
+
 @router.post("/chat", response_model=ChatResponse)
 async def chat(
     request: ChatRequest,
@@ -81,33 +120,10 @@ async def chat(
     qdrant_client: Annotated[QdrantClient, Depends(get_qdrant_client)],
     sparse_corpus: Annotated[SparseCorpus, Depends(get_sparse_corpus)],
 ) -> ChatResponse:
-    if current_user is None and request.conversation_id is not None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required to access saved conversations",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    # This also checks ownership before any external model/vector calls.
+    history = await get_request_history(request, db=db, current_user=current_user)
 
-    if current_user is not None:
-        if request.history:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail="Authenticated requests must omit client-supplied history",
-            )
-        if request.conversation_id is not None:
-            conversation = await chat_service.get_conversation(
-                db,
-                user_id=current_user.id,
-                conversation_id=request.conversation_id,
-            )
-            if conversation is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="Conversation not found",
-                )
-
-    # History contextualization is the next stage. For now, answer the current
-    # message independently, and offload synchronous model/vector calls.
+    # Contextualization and synchronous model/vector calls run in the worker.
     result = await run_in_threadpool(
         answer_question,
         request.message,
@@ -115,6 +131,7 @@ async def chat(
         qdrant_client=qdrant_client,
         collection_name=settings.qdrant_collection,
         model=settings.answer_model,
+        history=history,
         sparse_corpus=sparse_corpus,
         rerank_model=settings.answer_model if settings.rerank_enabled else None,
     )

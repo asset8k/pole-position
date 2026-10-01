@@ -13,6 +13,7 @@ from pole_position.chat.router import (
     get_qdrant_client,
     get_sparse_corpus,
 )
+from pole_position.chat.schemas import ChatHistoryMessage
 from pole_position.config import settings
 from pole_position.main import app
 from pole_position.rag.contracts import RetrievalChunk
@@ -84,6 +85,7 @@ def test_chat_returns_grounded_answer_and_citation(
         qdrant_client=qdrant_client,
         collection_name=settings.qdrant_collection,
         model=settings.answer_model,
+        history=[],
         sparse_corpus=sparse_corpus,
         rerank_model=settings.answer_model,
     )
@@ -109,6 +111,31 @@ def test_chat_returns_grounded_answer_and_citation(
         ],
         "conversation_id": None,
     }
+
+
+def test_guest_chat_passes_history_to_rag(
+    client: tuple[TestClient, Mock, Mock, Mock],
+) -> None:
+    test_client, _, _, _ = client
+    history = [
+        ChatHistoryMessage(role="user", content="What is the PU penalty?"),
+        ChatHistoryMessage(role="assistant", content="Ten places for the first one."),
+    ]
+    with patch(
+        "pole_position.chat.router.answer_question", return_value=make_answer()
+    ) as answer_mock:
+        response = test_client.post(
+            "/api/chat",
+            json={
+                "message": "And subsequent ones?",
+                "history": [item.model_dump() for item in history],
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.json()["conversation_id"] is None
+    assert answer_mock.call_args.args == ("And subsequent ones?",)
+    assert answer_mock.call_args.kwargs["history"] == history
 
 
 def test_chat_can_disable_reranking(

@@ -15,6 +15,7 @@ from pole_position.chat.router import (
     get_qdrant_client,
     get_sparse_corpus,
 )
+from pole_position.chat.schemas import ChatHistoryMessage
 from pole_position.main import app
 from pole_position.rag.contracts import RetrievalChunk
 from pole_position.rag.generation.citations import ValidatedAnswer, ValidatedCitation
@@ -132,9 +133,11 @@ def test_authenticated_chat_creates_conversation_and_saves_citations(
 def test_authenticated_chat_appends_to_existing_conversation(
     client: tuple[TestClient, AsyncSession, Mock],
 ) -> None:
-    test_client, db, _ = client
+    test_client, db, answer_mock = client
     headers = auth_headers(test_client)
     first = start_chat(test_client, headers)
+    assert answer_mock.call_args.kwargs["history"] == []
+    answer_mock.reset_mock()
     response = test_client.post(
         "/api/chat",
         headers=headers,
@@ -145,6 +148,11 @@ def test_authenticated_chat_appends_to_existing_conversation(
     )
     assert response.status_code == 200
     assert response.json()["conversation_id"] == first["conversation_id"]
+    answer_mock.assert_called_once()
+    assert answer_mock.call_args.kwargs["history"] == [
+        ChatHistoryMessage(role="user", content="What is the power unit penalty?"),
+        ChatHistoryMessage(role="assistant", content=first["answer"]),
+    ]
     assert count_rows(test_client, db, Conversation) == 1
     detail = test_client.get(
         f"/api/conversations/{first['conversation_id']}", headers=headers

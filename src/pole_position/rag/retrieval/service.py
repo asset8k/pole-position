@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from openai import OpenAI
 from qdrant_client import QdrantClient
 
+from pole_position.chat.schemas import ChatHistoryMessage
 from pole_position.corpus.schemas import RegulationSection
 from pole_position.rag.generation.answer_generator import generate_draft_answer
 from pole_position.rag.generation.citations import (
@@ -19,6 +20,7 @@ from pole_position.rag.generation.context_builder import (
 from pole_position.rag.generation.prompts import INSUFFICIENT_EVIDENCE_ANSWER
 from pole_position.rag.retrieval.dense import retrieve_dense
 from pole_position.rag.retrieval.fusion import fuse_hits
+from pole_position.rag.retrieval.query_contextualizer import contextualize_query
 from pole_position.rag.retrieval.reranker import (
     MAX_RERANK_CANDIDATES,
     rerank_hits,
@@ -35,13 +37,18 @@ def answer_question(
     qdrant_client: QdrantClient,
     collection_name: str,
     model: str,
+    history: Sequence[ChatHistoryMessage] = (),
     sparse_corpus: SparseCorpus | None = None,
     rerank_model: str | None = None,
     top_k: int = 5,
     section: RegulationSection | None = None,
     max_context_chars: int = DEFAULT_MAX_CONTEXT_CHARS,
 ) -> ValidatedAnswer:
-    """Retrieve regulation evidence and produce a citation-validated answer."""
+    """Resolve a follow-up, retrieve evidence, and validate the grounded answer.
+
+    History is chronological and excludes the latest question. It is used
+    only to rewrite that question, never as authoritative regulation evidence.
+    """
 
     if not question.strip():
         raise ValueError("Question cannot be empty")
@@ -64,10 +71,17 @@ def answer_question(
                 f"Reranking supports at most {MAX_RERANK_CANDIDATES} final hits"
             )
 
+    standalone_question = contextualize_query(
+        question,
+        history,
+        client=openai_client,
+        model=model,
+    )
+
     candidate_k = max(20, top_k) if sparse_corpus is not None else top_k
 
     dense_hits = retrieve_dense(
-        question,
+        standalone_question,
         openai_client=openai_client,
         qdrant_client=qdrant_client,
         collection_name=collection_name,
@@ -79,7 +93,7 @@ def answer_question(
 
     if sparse_corpus is not None:
         sparse_hits = retrieve_sparse(
-            question,
+            standalone_question,
             corpus=sparse_corpus,
             top_k=candidate_k,
             section=section,
@@ -96,7 +110,7 @@ def answer_question(
         if rerank_model is not None:
             try:
                 hits = rerank_hits(
-                    question,
+                    standalone_question,
                     fused_hits,
                     client=openai_client,
                     model=rerank_model,
@@ -111,7 +125,7 @@ def answer_question(
     context = build_context(hits, max_chars=max_context_chars)
 
     draft = generate_draft_answer(
-        question,
+        standalone_question,
         context,
         client=openai_client,
         model=model,

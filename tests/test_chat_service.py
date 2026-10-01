@@ -60,6 +60,109 @@ def test_conversation_title_is_single_line_and_bounded() -> None:
         service.make_conversation_title(" \n ")
 
 
+def test_recent_history_keeps_all_100_saved_messages(
+    db_client: tuple[TestClient, AsyncSession],
+) -> None:
+    client, db = db_client
+
+    async def check() -> None:
+        user = await add_user(db)
+        conversation = Conversation(user_id=user.id, title="A long thread")
+        db.add(conversation)
+        await db.flush()
+        # Equal timestamps exercise the ID tie-breaker used in real threads.
+        timestamp = datetime.now(UTC)
+        contents = [f"Message {index}" for index in range(100)]
+        db.add_all(
+            [
+                Message(
+                    conversation_id=conversation.id,
+                    role="user" if index % 2 == 0 else "assistant",
+                    content=content,
+                    citations=[],
+                    created_at=timestamp,
+                )
+                for index, content in enumerate(contents)
+            ]
+        )
+        await db.commit()
+
+        history = await service.get_recent_history(
+            db, user_id=user.id, conversation_id=conversation.id
+        )
+        assert history is not None
+        assert [item.content for item in history] == contents[-10:]
+        assert [item.role for item in history] == ["user", "assistant"] * 5
+        assert all(set(item.model_dump()) == {"role", "content"} for item in history)
+        shorter = await service.get_recent_history(
+            db, user_id=user.id, conversation_id=conversation.id, max_messages=3
+        )
+        assert shorter is not None
+        assert [item.content for item in shorter] == contents[-3:]
+
+        detail = await service.get_conversation(
+            db, user_id=user.id, conversation_id=conversation.id
+        )
+        assert detail is not None
+        assert [item.content for item in detail.messages] == contents
+
+    assert client.portal is not None
+    client.portal.call(check)
+
+
+def test_recent_history_distinguishes_empty_missing_and_unowned(
+    db_client: tuple[TestClient, AsyncSession],
+) -> None:
+    client, db = db_client
+
+    async def check() -> None:
+        owner = await add_user(db)
+        other = await add_user(db, "other")
+        conversation = Conversation(user_id=owner.id, title="Empty thread")
+        db.add(conversation)
+        await db.commit()
+        assert await service.get_recent_history(
+            db, user_id=owner.id, conversation_id=conversation.id
+        ) == []
+        populated = await save_first_turn(db, owner.id)
+        assert await service.get_recent_history(
+            db, user_id=other.id, conversation_id=populated.id
+        ) is None
+        assert await service.get_recent_history(
+            db, user_id=owner.id, conversation_id=conversation.id + 1000
+        ) is None
+
+    assert client.portal is not None
+    client.portal.call(check)
+
+
+def test_recent_history_truncates_only_model_copy_of_long_answer(
+    db_client: tuple[TestClient, AsyncSession],
+) -> None:
+    client, db = db_client
+
+    async def check() -> None:
+        user = await add_user(db)
+        long_answer = "a" * 9_000
+        saved = await service.save_chat_turn(
+            db, user_id=user.id, message="Explain this", answer=long_answer, citations=[]
+        )
+        assert saved is not None
+        history = await service.get_recent_history(
+            db, user_id=user.id, conversation_id=saved.id
+        )
+        assert history is not None
+        assert history[-1].content == long_answer[:8_000]
+        detail = await service.get_conversation(
+            db, user_id=user.id, conversation_id=saved.id
+        )
+        assert detail is not None
+        assert detail.messages[-1].content == long_answer
+
+    assert client.portal is not None
+    client.portal.call(check)
+
+
 def test_save_and_load_conversation_with_citations(
     db_client: tuple[TestClient, AsyncSession],
 ) -> None:

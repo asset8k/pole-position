@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from pole_position.chat.model import Conversation, Message
 from pole_position.chat.schemas import (
+    ChatHistoryMessage,
     ChatRequest,
     Citation,
     ConversationDetailResponse,
@@ -75,6 +76,43 @@ async def get_conversation(
         updated_at=conversation.updated_at,
         messages=[MessageResponse.model_validate(item) for item in messages],
     )
+
+
+async def get_recent_history(
+    db: AsyncSession,
+    *,
+    user_id: int,
+    conversation_id: int,
+    max_messages: int = 10,
+) -> list[ChatHistoryMessage] | None:
+    """Read a bounded history window, without changing the saved thread.
+
+    None means missing or unowned; [] means an owned but empty conversation.
+    Citation payloads are not needed for question contextualization.
+    """
+    if not 1 <= max_messages <= 10:
+        raise ValueError("max_messages must be between 1 and 10")
+
+    conversation = await _find_owned_conversation(
+        db, user_id=user_id, conversation_id=conversation_id
+    )
+    if conversation is None:
+        return None
+
+    result = await db.execute(
+        select(Message.role, Message.content)
+        .where(Message.conversation_id == conversation.id)
+        .order_by(Message.created_at.desc(), Message.id.desc())
+        .limit(max_messages)
+    )
+    # Select newest first so LIMIT keeps the latest messages, then restore
+    # chronological order. Truncate only the model's copy, never stored text.
+    return [
+        ChatHistoryMessage.model_validate(
+            {"role": role, "content": content[:8_000]}
+        )
+        for role, content in reversed(result.all())
+    ]
 
 
 async def save_chat_turn(

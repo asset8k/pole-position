@@ -1,3 +1,4 @@
+import json
 from collections.abc import Sequence
 from unittest.mock import Mock, patch
 
@@ -5,10 +6,12 @@ import pytest
 from openai import OpenAI
 from qdrant_client import QdrantClient
 
+from pole_position.chat.schemas import ChatHistoryMessage
 from pole_position.rag.contracts import RetrievalChunk
 from pole_position.rag.generation.prompts import INSUFFICIENT_EVIDENCE_ANSWER
 from pole_position.rag.retrieval.dense import DenseHit
 from pole_position.rag.retrieval.fusion import FusedHit
+from pole_position.rag.retrieval.query_contextualizer import ContextualizedQuery
 from pole_position.rag.retrieval.service import answer_question
 from pole_position.rag.retrieval.sparse import SparseCorpus, SparseHit
 
@@ -80,7 +83,106 @@ def test_answer_question_orchestrates_retrieval_generation_and_citations() -> No
         ("S2", hits[1]),
     ]
     openai_client.responses.create.assert_not_called()
+    openai_client.responses.parse.assert_not_called()
     qdrant_client.query_points.assert_not_called()
+
+
+def test_follow_up_rewrite_reaches_all_rag_stages_without_history_as_evidence() -> None:
+    openai_client = Mock(spec=OpenAI)
+    standalone_question = "What is the penalty for subsequent extra PU elements?"
+    openai_client.responses.parse.return_value = Mock(
+        status="completed",
+        output_parsed=ContextualizedQuery(standalone_question=standalone_question),
+    )
+    # Even direct service callers supplying more history keep only the latest 10.
+    history = [
+        ChatHistoryMessage(
+            role="user" if index % 2 == 0 else "assistant",
+            content=f"Untrusted history message {index}",
+        )
+        for index in range(12)
+    ]
+    original_history = [item.model_dump() for item in history]
+    original_question = "And subsequent ones?"
+    hit = make_hit("B8.2.8", 67)
+    selected = FusedHit(
+        chunk=hit.chunk,
+        fusion_score=0.03,
+        document_title=hit.document_title,
+        dense_rank=1,
+        sparse_rank=1,
+        dense_score=hit.score,
+        sparse_score=10.0,
+    )
+    with (
+        patch(
+            "pole_position.rag.retrieval.service.retrieve_dense", return_value=[hit]
+        ) as dense_mock,
+        patch(
+            "pole_position.rag.retrieval.service.retrieve_sparse",
+            return_value=[SparseHit(hit.chunk, 10.0, hit.document_title)],
+        ) as sparse_mock,
+        patch(
+            "pole_position.rag.retrieval.service.rerank_hits", return_value=[selected]
+        ) as rerank_mock,
+        patch(
+            "pole_position.rag.retrieval.service.generate_draft_answer",
+            return_value="Subsequent elements carry a penalty [S1].",
+        ) as generate_mock,
+    ):
+        result = answer_question(
+            original_question,
+            history=history,
+            openai_client=openai_client,
+            qdrant_client=Mock(spec=QdrantClient),
+            collection_name="fia_regulations",
+            model="answer-model",
+            sparse_corpus=Mock(spec=SparseCorpus),
+            rerank_model="rerank-model",
+        )
+
+    openai_client.responses.parse.assert_called_once()
+    kwargs = openai_client.responses.parse.call_args.kwargs
+    rewrite_input = json.loads(kwargs["input"])
+    assert rewrite_input == {
+        "history": original_history[-10:],
+        "question": original_question,
+    }
+    assert kwargs["model"] == "answer-model"
+    assert kwargs["store"] is False
+    for stage_mock in (dense_mock, sparse_mock, rerank_mock, generate_mock):
+        stage_mock.assert_called_once()
+        assert stage_mock.call_args.args[0] == standalone_question
+    context = generate_mock.call_args.args[1]
+    assert "Untrusted history" not in context.text
+    assert context.sources == {"S1": selected}
+    assert result.citations[0].hit is selected
+    assert [item.model_dump() for item in history] == original_history
+
+
+def test_contextualization_failure_stops_before_search_and_generation() -> None:
+    openai_client = Mock(spec=OpenAI)
+    openai_client.responses.parse.side_effect = RuntimeError("Rewrite unavailable")
+    with (
+        patch("pole_position.rag.retrieval.service.retrieve_dense") as dense_mock,
+        patch("pole_position.rag.retrieval.service.retrieve_sparse") as sparse_mock,
+        patch("pole_position.rag.retrieval.service.generate_draft_answer") as generate_mock,
+        pytest.raises(RuntimeError, match="Rewrite unavailable"),
+    ):
+        answer_question(
+            "And subsequent ones?",
+            history=[
+                ChatHistoryMessage(role="user", content="What is the PU penalty?")
+            ],
+            openai_client=openai_client,
+            qdrant_client=Mock(spec=QdrantClient),
+            collection_name="fia_regulations",
+            model="test-model",
+            sparse_corpus=Mock(spec=SparseCorpus),
+        )
+    dense_mock.assert_not_called()
+    sparse_mock.assert_not_called()
+    generate_mock.assert_not_called()
 
 
 def test_answer_question_fuses_overlapping_hits_and_cites_fused_sources() -> None:
