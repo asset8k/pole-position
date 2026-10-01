@@ -13,13 +13,13 @@ dependencies = [
     "fastapi[standard]>=0.141.1",
     "httpx>=0.28.1",
     "openai>=3.16.2",
-    "pwdlib>=0.3.1",
+    "pwdlib[argon2]>=0.3.1",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
     "pyjwt>=2.14.0",
     "pymupdf>=1.28.2",
     "qdrant-client>=1.19.1",
-    "sqlalchemy>=2.0.54",
+    "sqlalchemy[asyncio]>=2.0.54",
 ]
 
 [project.scripts]
