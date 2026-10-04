@@ -1,0 +1,732 @@
+{
+  "cases": [
+    {
+      "id": "general_composition_001",
+      "category": "exact_lookup",
+      "question": "According to A1.2.2, which sections and appendices make up the FIA F1 Regulations?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-a-issue-03",
+          "source_kind": "clause",
+          "clause_identifier": "A1.2.2",
+          "pdf_pages": [5]
+        }
+      ],
+      "expected_facts": [
+        "The regulations comprise Sections A through F and their related appendices.",
+        "The sections cover General Regulatory Provisions, Sporting, Technical, Financial Regulations for F1 Teams, Financial Regulations for PU Manufacturers, and Operational Regulations."
+      ]
+    },
+    {
+      "id": "general_preamble_001",
+      "category": "semantic",
+      "question": "What safety, fairness, sustainability, and engineering objectives does the preamble give for the F1 Regulations?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-a-issue-03",
+          "source_kind": "preamble",
+          "pdf_pages": [4]
+        }
+      ],
+      "expected_facts": [
+        "The objectives include promoting the highest safety standards and protecting sporting fairness.",
+        "They include competitive balance, environmental sustainability, and long-term financial stability and sustainability.",
+        "They include preserving Formula One's distinctive technology, innovation, and engineering challenge."
+      ]
+    },
+    {
+      "id": "general_penalty_points_001",
+      "category": "numerical",
+      "question": "What happens when a driver accumulates 12 Super Licence penalty points, and how long do individual penalty points remain?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-a-issue-03",
+          "source_kind": "clause",
+          "clause_identifier": "A3.3.1",
+          "pdf_pages": [14]
+        }
+      ],
+      "expected_facts": [
+        "Accumulating 12 points results in suspension from the next Competition, after which 12 points are removed.",
+        "Penalty points remain for 12 months and are removed on the 12-month anniversary of their imposition."
+      ]
+    },
+    {
+      "id": "general_nonbinding_documents_001",
+      "category": "terminology",
+      "question": "Do non-binding FIA F1 Documents create additional compliance obligations or form part of the FIA F1 Regulations?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-a-issue-03",
+          "source_kind": "clause",
+          "clause_identifier": "A1.2.3",
+          "pdf_pages": [6]
+        }
+      ],
+      "expected_facts": [
+        "Non-binding FIA F1 Documents are advisory and do not form part of the FIA F1 Regulations.",
+        "They do not add compliance obligations or requirements beyond the applicable regulations."
+      ]
+    },
+    {
+      "id": "general_pu_registration_001",
+      "category": "exact_lookup",
+      "question": "Under A3.6.2, what is the registration-form deadline for a PU Manufacturer planning to begin supplying Power Units in Year N?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-a-issue-03",
+          "source_kind": "clause",
+          "clause_identifier": "A3.6.2",
+          "pdf_pages": [15]
+        }
+      ],
+      "expected_facts": [
+        "The deadline is 30 June of Year N-4 for supply starting in Year N within the championship period covered by the provision."
+      ]
+    },
+    {
+      "id": "general_trophies_001",
+      "category": "exact_lookup",
+      "question": "Under Appendix A8, can the FIA championship trophies be displayed in a way that implies a commercial association between the FIA and a third party?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-a-issue-03",
+          "source_kind": "appendix",
+          "appendix_identifier": "A8",
+          "pdf_pages": [83]
+        }
+      ],
+      "expected_facts": [
+        "The FIA trophies must not be used, displayed, or positioned to suggest a commercial association between the FIA and a third party.",
+        "They must not be used in a way that brings, or could bring, the championship, FIA, Commercial Rights Holder, or motorsport into disrepute."
+      ]
+    },
+    {
+      "id": "sporting_dry_tyres_001",
+      "category": "semantic",
+      "question": "Does a driver who uses only dry-weather tyres have to use more than one tyre specification during the race?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-b-issue-08",
+          "source_kind": "clause",
+          "clause_identifier": "B6.3.6",
+          "pdf_pages": [58]
+        }
+      ],
+      "expected_facts": [
+        "Unless intermediate or wet-weather tyres have been used during the Race, a driver must use at least two different dry-weather tyre specifications.",
+        "At least one must be a mandatory dry-weather Race tyre specification."
+      ]
+    },
+    {
+      "id": "sporting_dry_tyres_penalty_001",
+      "category": "exact_lookup",
+      "question": "Under B6.3.6, what are the consequences of failing to meet the dry-weather tyre-specification requirement, including when a suspended race cannot restart?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-b-issue-08",
+          "source_kind": "clause",
+          "clause_identifier": "B6.3.6",
+          "pdf_pages": [58]
+        }
+      ],
+      "expected_facts": [
+        "The requirement applies unless the driver used intermediate or wet-weather tyres during the Race.",
+        "Failure to comply normally results in disqualification from the Race results.",
+        "If the Race is suspended and cannot restart, 30 seconds are added to the elapsed time of a driver who was required to use two specifications but did not."
+      ]
+    },
+    {
+      "id": "sporting_pu_penalties_001",
+      "category": "semantic",
+      "question": "What happens if a driver exceeds the permitted allocation of a Power Unit element type?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-b-issue-08",
+          "source_kind": "clause",
+          "clause_identifier": "B8.2.8",
+          "pdf_pages": [67]
+        }
+      ],
+      "expected_facts": [
+        "A grid penalty applies at the first Competition where each additional element is used.",
+        "The first additional element of each type incurs a 10-place race grid penalty; subsequent additional elements of that type incur five places.",
+        "The penalties are cumulative."
+      ]
+    },
+    {
+      "id": "sporting_red_flag_tyres_001",
+      "category": "semantic",
+      "question": "During a dry race that is suspended under red flags and then resumes, can teams change wheels and tyres during the suspension, and what two-specification requirement still applies if no intermediate or wet-weather tyres are used?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-b-issue-08",
+          "source_kind": "clause",
+          "clause_identifier": "B5.14.4",
+          "pdf_pages": [48]
+        },
+        {
+          "document_id": "fia-f1-2026-section-b-issue-08",
+          "source_kind": "clause",
+          "clause_identifier": "B6.3.6",
+          "pdf_pages": [58]
+        }
+      ],
+      "expected_facts": [
+        "Changing wheels and tyres is permitted before resumption once the car has stopped in the Fast Lane, provided the work does not impede resumption.",
+        "If no intermediate or wet-weather tyres are used, the driver must use at least two different dry-weather specifications during the Race, including a mandatory Race specification.",
+        "Permission to change tyres does not by itself establish that two different specifications were actually used."
+      ]
+    },
+    {
+      "id": "sporting_safety_car_laps_001",
+      "category": "exact_lookup",
+      "question": "According to B5.13.7, do laps completed behind the Safety Car count as laps of the session?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-b-issue-08",
+          "source_kind": "clause",
+          "clause_identifier": "B5.13.7",
+          "pdf_pages": [46]
+        }
+      ],
+      "expected_facts": [
+        "Each completed lap while the Safety Car is deployed counts as a TTCS lap.",
+        "The clause makes an exception for the procedure in B5.10, where B2.3.3a or B2.5.3a applies as appropriate."
+      ]
+    },
+    {
+      "id": "sporting_parc_ferme_brakes_001",
+      "category": "exact_lookup",
+      "question": "Which brake servicing operations are permitted by Section 1 of Appendix B2 while a car is under parc ferme?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-b-issue-08",
+          "source_kind": "appendix",
+          "appendix_identifier": "B2",
+          "pdf_pages": [86]
+        }
+      ],
+      "expected_facts": [
+        "Brake friction material may be removed, measured, de-glazed, and refitted.",
+        "The brake system may be bled."
+      ]
+    },
+    {
+      "id": "sporting_afc_definition_001",
+      "category": "terminology",
+      "question": "What does AFC mean in the Sporting Regulations, and what makes a Competition an AFC?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-b-issue-08",
+          "source_kind": "appendix",
+          "appendix_identifier": "B1",
+          "pdf_pages": [84]
+        }
+      ],
+      "expected_facts": [
+        "AFC means Alternative Format Competition.",
+        "An AFC is a Competition where a Sprint is scheduled."
+      ]
+    },
+    {
+      "id": "technical_coordinates_001",
+      "category": "semantic",
+      "question": "How are the X, Y, and Z directions of the F1 car coordinate system defined?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-c-issue-20",
+          "source_kind": "clause",
+          "clause_identifier": "C2.1.1",
+          "pdf_pages": [9]
+        }
+      ],
+      "expected_facts": [
+        "The system is a right-handed Cartesian coordinate system.",
+        "X is longitudinal and increases rearwards; Y is transverse and increases to the driver's right; Z is vertical and increases upwards."
+      ]
+    },
+    {
+      "id": "technical_minimum_mass_001",
+      "category": "numerical",
+      "question": "With no declared Heat Hazard, how does Minimum Mass in Qualifying and Sprint Qualifying differ from other sessions, including the Nominal Tyre Mass?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-c-issue-20",
+          "source_kind": "clause",
+          "clause_identifier": "C4.1",
+          "pdf_pages": [59]
+        }
+      ],
+      "expected_facts": [
+        "Minimum Mass in Qualifying and Sprint Qualifying is 726 kg plus Nominal Tyre Mass.",
+        "In other sessions it is 724 kg plus Nominal Tyre Mass.",
+        "Car Mass must not be below the applicable Minimum Mass during the Competition."
+      ]
+    },
+    {
+      "id": "technical_engine_capacity_001",
+      "category": "exact_lookup",
+      "question": "What engine cubic capacity and tolerance are permitted by C5.1.2?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-c-issue-20",
+          "source_kind": "clause",
+          "clause_identifier": "C5.1.2",
+          "pdf_pages": [61]
+        }
+      ],
+      "expected_facts": [
+        "Engine cubic capacity is 1600 cc with a tolerance of +0/-10 cc."
+      ]
+    },
+    {
+      "id": "technical_engine_cylinders_001",
+      "category": "numerical",
+      "question": "How many cylinders must the engine have, how are they arranged, and must they have equal capacity?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-c-issue-20",
+          "source_kind": "clause",
+          "clause_identifier": "C5.1.3",
+          "pdf_pages": [61]
+        }
+      ],
+      "expected_facts": [
+        "The engine has six cylinders in a 90-degree V configuration.",
+        "The normal section of each cylinder is circular, and all six cylinders have equal capacity."
+      ]
+    },
+    {
+      "id": "technical_width_001",
+      "category": "numerical",
+      "question": "At Legality Setup, how far from the Y=0 plane may car parts extend, excluding tyres, Wheel Rims, and the permitted parts attached to Wheel Rims?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-c-issue-20",
+          "source_kind": "clause",
+          "clause_identifier": "C2.3.1",
+          "pdf_pages": [10]
+        }
+      ],
+      "expected_facts": [
+        "No other part may lie more than 950 mm from the Y=0 plane at Legality Setup.",
+        "The exceptions are tyres, Wheel Rims, and parts attached to Wheel Rims as defined in C10.7.6."
+      ]
+    },
+    {
+      "id": "financial_team_scope_001",
+      "category": "semantic",
+      "question": "What kinds of team activity costs does the F1 Team Cost Cap limit, and can teams choose how to allocate resources within it?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-d-issue-07",
+          "source_kind": "clause",
+          "clause_identifier": "D1.2.1",
+          "pdf_pages": [4]
+        }
+      ],
+      "expected_facts": [
+        "The cap limits certain costs incurred by or on behalf of an F1 Team in each Full Year Financial Regulations Reporting Period for operating the team, including developing, manufacturing, testing, and racing F1 cars.",
+        "Teams remain free to decide how to allocate resources within the Cost Cap."
+      ]
+    },
+    {
+      "id": "financial_team_obligations_001",
+      "category": "exact_lookup",
+      "question": "What reporting and spending obligations does D4.1.1 impose on an F1 Team?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-d-issue-07",
+          "source_kind": "clause",
+          "clause_identifier": "D4.1.1",
+          "pdf_pages": [8]
+        }
+      ],
+      "expected_facts": [
+        "The team must determine and report Relevant Costs against the Cost Cap in its Presentation Currency.",
+        "It must not incur Relevant Costs above the cap, directly or through another entity, in the applicable Full Year Financial Regulations Reporting Period."
+      ]
+    },
+    {
+      "id": "financial_marketing_exclusion_001",
+      "category": "semantic",
+      "question": "Are costs directly attributable to Marketing Activities included when calculating an F1 Team's Relevant Costs?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-d-issue-07",
+          "source_kind": "clause",
+          "clause_identifier": "D5.1.1",
+          "pdf_pages": [10]
+        }
+      ],
+      "expected_facts": [
+        "All costs Directly Attributable to Marketing Activities are Excluded Costs and must be excluded when calculating Relevant Costs."
+      ]
+    },
+    {
+      "id": "financial_team_definitive_language_001",
+      "category": "exact_lookup",
+      "question": "Under D1.3.3, which language version of the F1 Team Financial Regulations is definitive if an interpretation dispute arises?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-d-issue-07",
+          "source_kind": "clause",
+          "clause_identifier": "D1.3.3",
+          "pdf_pages": [4]
+        }
+      ],
+      "expected_facts": [
+        "The English version is definitive and is used in disputes about interpretation."
+      ]
+    },
+    {
+      "id": "financial_pu_scope_001",
+      "category": "semantic",
+      "question": "Does the Power Unit Cost Cap cover only the PU Manufacturer itself, or also costs incurred by or on behalf of other entities within its Legal Group?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-e-issue-06",
+          "source_kind": "clause",
+          "clause_identifier": "E1.2.1",
+          "pdf_pages": [3]
+        }
+      ],
+      "expected_facts": [
+        "The Power Unit Cost Cap limits certain costs incurred by or on behalf of the PU Manufacturer or another entity within its Legal Group in each Full Year Financial Regulations Reporting Period.",
+        "The PU Manufacturer remains free to allocate resources within that cap."
+      ]
+    },
+    {
+      "id": "financial_pu_obligations_001",
+      "category": "exact_lookup",
+      "question": "What obligations about Relevant Costs and Presentation Currency are imposed on a PU Manufacturer by E2.2.1?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-e-issue-06",
+          "source_kind": "clause",
+          "clause_identifier": "E2.2.1",
+          "pdf_pages": [5]
+        }
+      ],
+      "expected_facts": [
+        "The manufacturer must determine and report Relevant Costs against the Power Unit Cost Cap in its Presentation Currency.",
+        "Its Relevant Costs must not exceed the cap in the applicable Full Year Financial Regulations Reporting Period."
+      ]
+    },
+    {
+      "id": "financial_pu_cap_amounts_001",
+      "category": "numerical",
+      "question": "What base US-dollar Power Unit Cost Cap amounts apply in N-3 through N-1 and from a manufacturer's Inaugural Season onwards, before applying Indexation?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-e-issue-06",
+          "source_kind": "clause",
+          "clause_identifier": "E2.3.1",
+          "pdf_pages": [5]
+        }
+      ],
+      "expected_facts": [
+        "The base cap in each N-3, N-2, and N-1 Full Year Financial Regulations Reporting Period is USD 148,500,000.",
+        "The base cap for the full-year period ending in the Inaugural Season and each subsequent full-year period is USD 190,000,000.",
+        "Both amounts are subject to Indexation."
+      ]
+    },
+    {
+      "id": "financial_pu_reliability_table_001",
+      "category": "numerical",
+      "question": "What US-dollar forfait value is assigned to an MGU-K in Table 1 of Appendix E2's Reliability Allowance?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-e-issue-06",
+          "source_kind": "appendix",
+          "appendix_identifier": "E2",
+          "pdf_pages": [60]
+        }
+      ],
+      "expected_facts": [
+        "Table 1 assigns an MGU-K a forfait value of USD 175,000."
+      ]
+    },
+    {
+      "id": "operational_environmental_accreditation_001",
+      "category": "numerical",
+      "question": "What minimum FIA Environmental Accreditation must each Competitor hold?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-f-issue-10",
+          "source_kind": "clause",
+          "clause_identifier": "F2.1.1",
+          "pdf_pages": [4]
+        }
+      ],
+      "expected_facts": [
+        "Each Competitor must hold at least 3 Star FIA Environmental Accreditation."
+      ]
+    },
+    {
+      "id": "operational_team_summer_shutdown_001",
+      "category": "numerical",
+      "question": "How long is the first F1 Team factory shutdown, when does it occur, and what exception applies when consecutive Competitions are 17 days apart?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-f-issue-10",
+          "source_kind": "clause",
+          "clause_identifier": "F3.1.1",
+          "pdf_pages": [5]
+        }
+      ],
+      "expected_facts": [
+        "The first shutdown is 14 consecutive calendar days in July and/or August.",
+        "If two consecutive Competitions in this period are only 17 days apart, the shutdown is 13 consecutive calendar days."
+      ]
+    },
+    {
+      "id": "operational_atp_001",
+      "category": "terminology",
+      "question": "What is an ATP in aerodynamic testing, how many occur in a year, and are there gaps between them?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-f-issue-10",
+          "source_kind": "clause",
+          "clause_identifier": "F4.1.4",
+          "pdf_pages": [9]
+        }
+      ],
+      "expected_facts": [
+        "ATP means Aerodynamic Testing Period, a period of consecutive calendar weeks used to evaluate aerodynamic testing limits.",
+        "There are six ATPs in a year, and a new period begins immediately after the previous one with no gaps.",
+        "The FIA may revise these periods in exceptional circumstances."
+      ]
+    },
+    {
+      "id": "operational_wind_on_time_001",
+      "category": "terminology",
+      "question": "How is wind-on time defined for RWTT, and what wind tunnel air-speed threshold is used?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-f-issue-10",
+          "source_kind": "clause",
+          "clause_identifier": "F4.2.3",
+          "pdf_pages": [10]
+        }
+      ],
+      "expected_facts": [
+        "Wind-on time is the time in hours, summed over the ATP, when wind tunnel air speed exceeds 15 m/s for Restricted Wind Tunnel Testing."
+      ]
+    },
+    {
+      "id": "operational_atr_definition_001",
+      "category": "terminology",
+      "question": "What do ATR limit, which aerodynamic development methods do they cover, and why are they imposed?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-f-issue-10",
+          "source_kind": "appendix",
+          "appendix_identifier": "F1",
+          "pdf_pages": [31]
+        }
+      ],
+      "expected_facts": [
+        "ATR means Aerodynamic Testing Restrictions and limits F1 Teams' aerodynamic development through wind tunnel testing and CFD.",
+        "The measures control costs and limit escalation of aerodynamic development activities."
+      ]
+    },
+    {
+      "id": "cross_document_cost_cap_scope_001",
+      "category": "cross_document",
+      "question": "Compare the stated scope of the F1 Team Cost Cap with the Power Unit Cost Cap, and explain whether each regulated entity can allocate resources freely within its cap.",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-d-issue-07",
+          "source_kind": "clause",
+          "clause_identifier": "D1.2.1",
+          "pdf_pages": [4]
+        },
+        {
+          "document_id": "fia-f1-2026-section-e-issue-06",
+          "source_kind": "clause",
+          "clause_identifier": "E1.2.1",
+          "pdf_pages": [3]
+        }
+      ],
+      "expected_facts": [
+        "The F1 Team Cost Cap limits certain costs of operating an F1 Team, including development, manufacture, testing, and racing of its cars.",
+        "The Power Unit Cost Cap limits certain costs incurred by or on behalf of a PU Manufacturer or another entity in its Legal Group.",
+        "Both provisions leave the regulated entity free to allocate resources within its cap."
+      ]
+    },
+    {
+      "id": "cross_document_relevant_costs_001",
+      "category": "cross_document",
+      "question": "Do both F1 Teams and PU Manufacturers have to report Relevant Costs in their Presentation Currency and keep those costs within their applicable cap?",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-d-issue-07",
+          "source_kind": "clause",
+          "clause_identifier": "D4.1.1",
+          "pdf_pages": [8]
+        },
+        {
+          "document_id": "fia-f1-2026-section-e-issue-06",
+          "source_kind": "clause",
+          "clause_identifier": "E2.2.1",
+          "pdf_pages": [5]
+        }
+      ],
+      "expected_facts": [
+        "Both F1 Teams and PU Manufacturers must determine and report Relevant Costs in their respective Presentation Currency.",
+        "Both must keep Relevant Costs within the relevant cap in the applicable Full Year Financial Regulations Reporting Period."
+      ]
+    },
+    {
+      "id": "follow_up_tyre_penalties_001",
+      "category": "follow_up",
+      "question": "What happens if a driver does not comply with that requirement?",
+      "history": [
+        {
+          "role": "user",
+          "content": "How many dry-weather tyre specifications must a driver use during a race?"
+        },
+        {
+          "role": "assistant",
+          "content": "Unless intermediate or wet-weather tyres are used, the driver must use at least two different dry-weather specifications, including a mandatory Race specification."
+        }
+      ],
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-b-issue-08",
+          "source_kind": "clause",
+          "clause_identifier": "B6.3.6",
+          "pdf_pages": [58]
+        }
+      ],
+      "expected_facts": [
+        "The non-compliance question refers to the dry-weather tyre-specification requirement, which does not apply if intermediate or wet-weather tyres were used.",
+        "Non-compliance normally leads to disqualification from the Race results.",
+        "If the Race is suspended and cannot restart, a driver required to use two specifications but failing to do so receives 30 seconds added to elapsed time."
+      ]
+    },
+    {
+      "id": "follow_up_pu_penalties_001",
+      "category": "follow_up",
+      "question": "And what about the next additional one of the same type?",
+      "history": [
+        {
+          "role": "user",
+          "content": "What is the grid penalty the first time a driver uses a Power Unit element of a type beyond its permitted allocation?"
+        },
+        {
+          "role": "assistant",
+          "content": "The first additional element of each type carries a ten-place race grid penalty."
+        }
+      ],
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-b-issue-08",
+          "source_kind": "clause",
+          "clause_identifier": "B8.2.8",
+          "pdf_pages": [67]
+        }
+      ],
+      "expected_facts": [
+        "A subsequent additional Power Unit element of the same type carries a five-place race grid penalty.",
+        "The penalty applies at the first Competition where that additional element is used, and penalties are cumulative."
+      ]
+    },
+    {
+      "id": "follow_up_team_winter_shutdown_001",
+      "category": "follow_up",
+      "question": "When does the second one start, and how long does it last?",
+      "history": [
+        {
+          "role": "user",
+          "content": "How long is the first F1 Team factory shutdown?"
+        },
+        {
+          "role": "assistant",
+          "content": "The first F1 Team factory shutdown is normally 14 consecutive calendar days in July and/or August, or 13 days when consecutive Competitions are only 17 days apart."
+        }
+      ],
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document_id": "fia-f1-2026-section-f-issue-10",
+          "source_kind": "clause",
+          "clause_identifier": "F3.1.1",
+          "pdf_pages": [5]
+        }
+      ],
+      "expected_facts": [
+        "The second F1 Team factory shutdown starts on 24 December and lasts nine consecutive calendar days."
+      ]
+    },
+    {
+      "id": "unanswerable_championship_result_001",
+      "category": "unanswerable",
+      "question": "Who won the 2026 Formula One Drivers' Championship, and what was their final points total?",
+      "answerable": false,
+      "expected_sources": [],
+      "expected_facts": []
+    },
+    {
+      "id": "unanswerable_driver_salary_001",
+      "category": "unanswerable",
+      "question": "What exact salary did Max Verstappen receive from his team in 2026?",
+      "answerable": false,
+      "expected_sources": [],
+      "expected_facts": []
+    },
+    {
+      "id": "unanswerable_private_car_data_001",
+      "category": "unanswerable",
+      "question": "Give me the confidential aerodynamic CAD coordinates of Ferrari's actual 2026 front wing design.",
+      "answerable": false,
+      "expected_sources": [],
+      "expected_facts": []
+    },
+    {
+      "id": "unanswerable_personal_information_001",
+      "category": "unanswerable",
+      "question": "What is my home address?",
+      "answerable": false,
+      "expected_sources": [],
+      "expected_facts": []
+    }
+  ]
+}
