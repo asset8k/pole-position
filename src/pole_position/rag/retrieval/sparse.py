@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from pole_position.corpus.manifest import load_manifest
-from pole_position.corpus.schemas import RegulationSection
+from pole_position.corpus.schemas import CorpusManifest, RegulationSection
 from pole_position.rag.contracts import ChunkedDocument, RetrievalChunk
 from pole_position.rag.indexing.bm25_index import BM25Index
 
@@ -25,9 +25,10 @@ def load_sparse_corpus(
     chunks_dir: Path,
     *,
     season: int = 2026,
+    manifest: CorpusManifest | None = None,
 ) -> SparseCorpus:
     """Build a BM25 index from active documents for one season."""
-    manifest = load_manifest(manifest_path)
+    manifest = manifest if manifest is not None else load_manifest(manifest_path)
 
     chunks: list[RetrievalChunk] = []
     document_titles: dict[str, str] = {}

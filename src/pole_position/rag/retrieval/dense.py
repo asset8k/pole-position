@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+from pathlib import Path
 
 from openai import OpenAI
 from qdrant_client import QdrantClient, models
 
+from pole_position.corpus.manifest import load_manifest
 from pole_position.corpus.schemas import RegulationSection
 from pole_position.rag.contracts import RetrievalChunk
 from pole_position.rag.indexing.embeddings import embed_texts
@@ -24,8 +26,9 @@ def retrieve_dense(
     collection_name: str,
     top_k: int = 5,
     section: RegulationSection | None = None,
+    document_ids: tuple[str, ...] | None = None,
 ) -> list[DenseHit]:
-    """Find chunks semantically similar to a question."""
+    """Search one active manifest snapshot; staged/retired versions stay excluded."""
     question = question.strip()
 
     if not question:
@@ -35,24 +38,36 @@ def retrieve_dense(
     if not collection_name.strip():
         raise ValueError("Collection name cannot be empty")
 
+    if document_ids is None:
+        manifest = load_manifest(
+            Path(__file__).resolve().parents[4]
+            / "data/manifests/2026_f1_regulations.json"
+        )
+        document_ids = tuple(
+            doc.document_id
+            for doc in manifest.documents
+            if doc.is_active and doc.season == 2026
+        )
+    if not document_ids:
+        raise ValueError("Active document IDs cannot be empty")
+
     query_vector = embed_texts(openai_client, [question])[0]
 
-    section_filter = None
+    conditions = [
+        models.FieldCondition(
+            key="document_id", match=models.MatchAny(any=list(document_ids)),
+        )
+    ]
     if section is not None:
-        section_filter = models.Filter(
-            must=[
-                models.FieldCondition(
-                    key="section",
-                    match=models.MatchValue(value=section),
-                )
-            ]
+        conditions.append(
+            models.FieldCondition(key="section", match=models.MatchValue(value=section))
         )
 
     response = qdrant_client.query_points(
         collection_name=collection_name,
         query=query_vector,
         using=DENSE_VECTOR_NAME,
-        query_filter=section_filter,
+        query_filter=models.Filter(must=conditions),
         limit=top_k,
         with_payload=True,
         with_vectors=False,

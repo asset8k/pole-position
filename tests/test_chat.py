@@ -9,12 +9,15 @@ from qdrant_client import QdrantClient
 from pole_position.chat.router import (
     CHUNKS_DIR,
     MANIFEST_PATH,
+    _sparse_corpus_for_manifest,
     get_openai_client,
     get_qdrant_client,
     get_sparse_corpus,
 )
 from pole_position.chat.schemas import ChatHistoryMessage
 from pole_position.config import settings
+from pole_position.corpus.manifest import load_manifest
+from pole_position.corpus.schemas import CorpusManifest
 from pole_position.main import app
 from pole_position.rag.contracts import RetrievalChunk
 from pole_position.rag.generation.citations import ValidatedAnswer, ValidatedCitation
@@ -193,9 +196,9 @@ def test_chat_rejects_invalid_request_before_answering(
     answer_mock.assert_not_called()
 
 
-def test_sparse_corpus_is_loaded_once_per_process() -> None:
+def test_sparse_corpus_is_cached_for_unchanged_manifest() -> None:
     sparse_corpus = Mock(spec=SparseCorpus)
-    get_sparse_corpus.cache_clear()
+    _sparse_corpus_for_manifest.cache_clear()
 
     try:
         with patch(
@@ -208,6 +211,32 @@ def test_sparse_corpus_is_loaded_once_per_process() -> None:
         load_mock.assert_called_once_with(
             manifest_path=MANIFEST_PATH,
             chunks_dir=CHUNKS_DIR,
+            manifest=load_manifest(MANIFEST_PATH),
         )
     finally:
-        get_sparse_corpus.cache_clear()
+        _sparse_corpus_for_manifest.cache_clear()
+
+
+def test_sparse_corpus_refreshes_when_manifest_changes(tmp_path, monkeypatch) -> None:
+    from pole_position.chat import router as chat_router
+
+    manifest = load_manifest(MANIFEST_PATH)
+    path = tmp_path / "manifest.json"
+    path.write_text(manifest.model_dump_json(), encoding="utf-8")
+    monkeypatch.setattr(chat_router, "MANIFEST_PATH", path)
+    first, second = Mock(spec=SparseCorpus), Mock(spec=SparseCorpus)
+    _sparse_corpus_for_manifest.cache_clear()
+    try:
+        with patch.object(chat_router, "load_sparse_corpus", side_effect=[first, second]) as loader:
+            assert get_sparse_corpus() is first
+            assert get_sparse_corpus() is first
+            documents = list(manifest.documents)
+            documents[0] = documents[0].model_copy(update={"document_id": "new-version"})
+            updated = CorpusManifest(documents=documents)
+            path.write_text(updated.model_dump_json(), encoding="utf-8")
+            assert get_sparse_corpus() is second
+            assert get_sparse_corpus() is second
+            assert loader.call_count == 2
+            assert loader.call_args.kwargs["manifest"] == updated
+    finally:
+        _sparse_corpus_for_manifest.cache_clear()

@@ -33,6 +33,7 @@ from pole_position.chat.schemas import (
     ConversationUpdateRequest,
 )
 from pole_position.config import settings
+from pole_position.corpus.schemas import CorpusManifest
 from pole_position.database import get_db
 from pole_position.rag.retrieval.service import answer_question
 from pole_position.rag.retrieval.sparse import SparseCorpus, load_sparse_corpus
@@ -64,13 +65,19 @@ def get_qdrant_client() -> Iterator[QdrantClient]:
         client.close()
 
 
-@lru_cache(maxsize=1)
-def get_sparse_corpus() -> SparseCorpus:
-    """Load and index active 2026 chunks once per server process."""
+@lru_cache(maxsize=2)
+def _sparse_corpus_for_manifest(manifest_json: str) -> SparseCorpus:
+    """Cache by manifest contents, not by process lifetime."""
     return load_sparse_corpus(
         manifest_path=MANIFEST_PATH,
         chunks_dir=CHUNKS_DIR,
+        manifest=CorpusManifest.model_validate_json(manifest_json),
     )
+
+
+def get_sparse_corpus() -> SparseCorpus:
+    # Atomic manifest replacement gives each request one coherent snapshot.
+    return _sparse_corpus_for_manifest(MANIFEST_PATH.read_text(encoding="utf-8"))
 
 
 async def get_request_history(

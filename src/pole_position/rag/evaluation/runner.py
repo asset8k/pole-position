@@ -130,6 +130,7 @@ def run_evaluation(
             qdrant_client=qdrant_client,
             collection_name=collection_name,
             top_k=candidate_k,
+            document_ids=tuple(sparse_corpus.document_titles),
         )
 
         sparse_hits = retrieve_sparse(

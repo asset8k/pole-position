@@ -114,10 +114,10 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-b-issue-08",
+          "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
           "source_kind": "clause",
           "clause_identifier": "B6.3.6",
-          "pdf_pages": [58]
+          "pdf_pages": [59]
         }
       ],
       "expected_facts": [
@@ -132,10 +132,10 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-b-issue-08",
+          "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
           "source_kind": "clause",
           "clause_identifier": "B6.3.6",
-          "pdf_pages": [58]
+          "pdf_pages": [59]
         }
       ],
       "expected_facts": [
@@ -151,10 +151,10 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-b-issue-08",
+          "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
           "source_kind": "clause",
           "clause_identifier": "B8.2.8",
-          "pdf_pages": [67]
+          "pdf_pages": [68]
         }
       ],
       "expected_facts": [
@@ -170,16 +170,16 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-b-issue-08",
+          "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
           "source_kind": "clause",
           "clause_identifier": "B5.14.4",
-          "pdf_pages": [48]
+          "pdf_pages": [49]
         },
         {
-          "document_id": "fia-f1-2026-section-b-issue-08",
+          "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
           "source_kind": "clause",
           "clause_identifier": "B6.3.6",
-          "pdf_pages": [58]
+          "pdf_pages": [59]
         }
       ],
       "expected_facts": [
@@ -195,10 +195,10 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-b-issue-08",
+          "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
           "source_kind": "clause",
           "clause_identifier": "B5.13.7",
-          "pdf_pages": [46]
+          "pdf_pages": [47]
         }
       ],
       "expected_facts": [
@@ -213,10 +213,10 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-b-issue-08",
+          "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
           "source_kind": "appendix",
           "appendix_identifier": "B2",
-          "pdf_pages": [86]
+          "pdf_pages": [87]
         }
       ],
       "expected_facts": [
@@ -231,10 +231,10 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-b-issue-08",
+          "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
           "source_kind": "appendix",
           "appendix_identifier": "B1",
-          "pdf_pages": [84]
+          "pdf_pages": [85]
         }
       ],
       "expected_facts": [
@@ -339,7 +339,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-d-issue-07",
+          "document_id": "fia-f1-2026-section-d-issue-08-sha-a130c221d590",
           "source_kind": "clause",
           "clause_identifier": "D1.2.1",
           "pdf_pages": [4]
@@ -357,7 +357,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-d-issue-07",
+          "document_id": "fia-f1-2026-section-d-issue-08-sha-a130c221d590",
           "source_kind": "clause",
           "clause_identifier": "D4.1.1",
           "pdf_pages": [8]
@@ -375,7 +375,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-d-issue-07",
+          "document_id": "fia-f1-2026-section-d-issue-08-sha-a130c221d590",
           "source_kind": "clause",
           "clause_identifier": "D5.1.1",
           "pdf_pages": [10]
@@ -392,7 +392,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-d-issue-07",
+          "document_id": "fia-f1-2026-section-d-issue-08-sha-a130c221d590",
           "source_kind": "clause",
           "clause_identifier": "D1.3.3",
           "pdf_pages": [4]
@@ -481,7 +481,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-f-issue-10",
+          "document_id": "fia-f1-2026-section-f-issue-11-sha-382b1b5bdb49",
           "source_kind": "clause",
           "clause_identifier": "F2.1.1",
           "pdf_pages": [4]
@@ -498,7 +498,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-f-issue-10",
+          "document_id": "fia-f1-2026-section-f-issue-11-sha-382b1b5bdb49",
           "source_kind": "clause",
           "clause_identifier": "F3.1.1",
           "pdf_pages": [5]
@@ -516,7 +516,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-f-issue-10",
+          "document_id": "fia-f1-2026-section-f-issue-11-sha-382b1b5bdb49",
           "source_kind": "clause",
           "clause_identifier": "F4.1.4",
           "pdf_pages": [9]
@@ -535,7 +535,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-f-issue-10",
+          "document_id": "fia-f1-2026-section-f-issue-11-sha-382b1b5bdb49",
           "source_kind": "clause",
           "clause_identifier": "F4.2.3",
           "pdf_pages": [10]
@@ -552,7 +552,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-f-issue-10",
+          "document_id": "fia-f1-2026-section-f-issue-11-sha-382b1b5bdb49",
           "source_kind": "appendix",
           "appendix_identifier": "F1",
           "pdf_pages": [31]
@@ -570,7 +570,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-d-issue-07",
+          "document_id": "fia-f1-2026-section-d-issue-08-sha-a130c221d590",
           "source_kind": "clause",
           "clause_identifier": "D1.2.1",
           "pdf_pages": [4]
@@ -595,7 +595,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-d-issue-07",
+          "document_id": "fia-f1-2026-section-d-issue-08-sha-a130c221d590",
           "source_kind": "clause",
           "clause_identifier": "D4.1.1",
           "pdf_pages": [8]
@@ -629,10 +629,10 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-b-issue-08",
+          "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
           "source_kind": "clause",
           "clause_identifier": "B6.3.6",
-          "pdf_pages": [58]
+          "pdf_pages": [59]
         }
       ],
       "expected_facts": [
@@ -658,10 +658,10 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-b-issue-08",
+          "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
           "source_kind": "clause",
           "clause_identifier": "B8.2.8",
-          "pdf_pages": [67]
+          "pdf_pages": [68]
         }
       ],
       "expected_facts": [
@@ -686,7 +686,7 @@
       "answerable": true,
       "expected_sources": [
         {
-          "document_id": "fia-f1-2026-section-f-issue-10",
+          "document_id": "fia-f1-2026-section-f-issue-11-sha-382b1b5bdb49",
           "source_kind": "clause",
           "clause_identifier": "F3.1.1",
           "pdf_pages": [5]

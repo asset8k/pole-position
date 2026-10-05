@@ -27,10 +27,11 @@ def main() -> None:
     print(f"Verified {len(manifest.documents)} regulation documents")
 
     section_document = next(
-        document for document in manifest.documents if document.section == args.section
+        document for document in manifest.documents
+        if document.section == args.section and document.is_active
     )
 
-    extracted_document = extract_pdf(section_document, PROJECT_ROOT)
+    extracted_document = extract_pdf(section_document, PROJECT_ROOT, exclude_struck_text=True)
 
     artifact_directory = PROJECT_ROOT / "artifacts/extracted"
     artifact_directory.mkdir(parents=True, exist_ok=True)

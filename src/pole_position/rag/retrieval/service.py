@@ -87,6 +87,9 @@ def answer_question(
         collection_name=collection_name,
         top_k=candidate_k,
         section=section,
+        document_ids=(
+            tuple(sparse_corpus.document_titles) if sparse_corpus is not None else None
+        ),
     )
 
     hits: Sequence[EvidenceHit] = dense_hits

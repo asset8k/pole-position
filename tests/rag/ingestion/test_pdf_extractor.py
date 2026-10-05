@@ -1,9 +1,11 @@
 from pathlib import Path
 
 import pytest
+import pymupdf
+from unittest.mock import Mock
 
 from pole_position.corpus.manifest import load_manifest
-from pole_position.rag.ingestion.pdf_extractor import extract_pdf
+from pole_position.rag.ingestion.pdf_extractor import extract_pdf, extract_current_page_text
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 MANIFEST_PATH = PROJECT_ROOT / "data/manifests/2026_f1_regulations.json"
@@ -26,3 +28,37 @@ def test_extract_pdf_returns_all_section_a_pages() -> None:
         range(1, section_a.page_count + 1)
     )
     assert "GENERAL REGULATORY PROVISIONS" in extracted.pages[0].text
+
+
+def test_struck_deleted_text_is_removed_but_additions_and_underlines_remain() -> None:
+    page = Mock()
+    page.get_text.return_value = {"blocks": [{"lines": [
+        {"spans": [{"text": "Deleted old rule", "char_flags": 17}]},
+        {"spans": [{"text": "New pink rule", "char_flags": 16, "color": 16711935}]},
+        {"spans": [{"text": "Underlined text", "char_flags": 18}]},
+        {"spans": [{"text": "Use ", "char_flags": 16},
+                   {"text": "old", "char_flags": 17},
+                   {"text": "new wording", "char_flags": 16}]},
+    ]}]}
+    text = extract_current_page_text(page, "Unfiltered extraction")
+    assert "Deleted" not in text
+    assert "New pink rule\nUnderlined text\nUse new wording" in text
+    assert page.get_text.call_args.kwargs["flags"] & pymupdf.TEXT_COLLECT_STYLES
+
+
+def test_missed_single_glyph_does_not_leave_a_deleted_line_fragment() -> None:
+    page = Mock()
+    page.get_text.return_value = {"blocks": [{"lines": [{"spans": [
+        {"text": "If the Of", "char_flags": 17},
+        {"text": "f", "char_flags": 16},
+        {"text": "icial Weather Service predicts rain", "char_flags": 17},
+    ]}]}]}
+    assert extract_current_page_text(page, "Old sentence") == "\n"
+
+
+def test_pages_without_deletions_keep_original_line_breaks() -> None:
+    page = Mock()
+    page.get_text.return_value = {"blocks": [{"lines": [{"spans": [
+        {"text": "Existing text", "char_flags": 16},
+    ]}]}]}
+    assert extract_current_page_text(page, "Original\nline breaks\n") == "Original\nline breaks\n"

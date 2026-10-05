@@ -152,6 +152,7 @@ def main() -> None:
             collection_name=settings.qdrant_collection,
             top_k=candidate_k,
             section=section,
+            document_ids=tuple(sparse_corpus.document_titles),
         )
         sparse_hits = retrieve_sparse(
             args.question,

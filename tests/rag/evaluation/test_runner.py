@@ -138,7 +138,7 @@ def pipeline(monkeypatch: pytest.MonkeyPatch) -> RunnerMocks:
     mocks = RunnerMocks(
         openai_client=Mock(spec=OpenAI),
         qdrant_client=Mock(spec=QdrantClient),
-        sparse_corpus=Mock(spec=SparseCorpus),
+        sparse_corpus=Mock(spec=SparseCorpus, document_titles={make_chunk().document_id: DOCUMENT_TITLE}),
         contextualize=Mock(side_effect=lambda question, history, **kwargs: question),
         dense=Mock(
             return_value=[
@@ -201,6 +201,7 @@ def test_runner_reuses_retrieval_results_without_oracle_section_filters(
         qdrant_client=pipeline.qdrant_client,
         collection_name="fia_regulations",
         top_k=10,
+        document_ids=(make_chunk().document_id,),
     )
     pipeline.sparse.assert_called_once_with(
         "Which rule applies?", corpus=pipeline.sparse_corpus, top_k=10

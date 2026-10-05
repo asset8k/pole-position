@@ -68,6 +68,7 @@ def test_answer_question_orchestrates_retrieval_generation_and_citations() -> No
         collection_name="fia_regulations",
         top_k=3,
         section="B",
+        document_ids=None,
     )
     generate_mock.assert_called_once()
     args, kwargs = generate_mock.call_args
@@ -137,7 +138,7 @@ def test_follow_up_rewrite_reaches_all_rag_stages_without_history_as_evidence() 
             qdrant_client=Mock(spec=QdrantClient),
             collection_name="fia_regulations",
             model="answer-model",
-            sparse_corpus=Mock(spec=SparseCorpus),
+            sparse_corpus=Mock(spec=SparseCorpus, document_titles={make_hit("B8.2.8", 67).chunk.document_id: "Sporting Regulations"}),
             rerank_model="rerank-model",
         )
 
@@ -178,7 +179,7 @@ def test_contextualization_failure_stops_before_search_and_generation() -> None:
             qdrant_client=Mock(spec=QdrantClient),
             collection_name="fia_regulations",
             model="test-model",
-            sparse_corpus=Mock(spec=SparseCorpus),
+            sparse_corpus=Mock(spec=SparseCorpus, document_titles={make_hit("B8.2.8", 67).chunk.document_id: "Sporting Regulations"}),
         )
     dense_mock.assert_not_called()
     sparse_mock.assert_not_called()
@@ -188,7 +189,7 @@ def test_contextualization_failure_stops_before_search_and_generation() -> None:
 def test_answer_question_fuses_overlapping_hits_and_cites_fused_sources() -> None:
     openai_client = Mock(spec=OpenAI)
     qdrant_client = Mock(spec=QdrantClient)
-    sparse_corpus = Mock(spec=SparseCorpus)
+    sparse_corpus = Mock(spec=SparseCorpus, document_titles={make_hit("B8.2.8", 67).chunk.document_id: "Sporting Regulations"})
     dense_only = make_hit("B8.2.2", 66)
     shared = make_hit("B8.2.8", 67)
     sparse_only = make_hit("B8.2.3", 67)
@@ -231,6 +232,7 @@ def test_answer_question_fuses_overlapping_hits_and_cites_fused_sources() -> Non
         collection_name="fia_regulations",
         top_k=20,
         section="B",
+        document_ids=tuple(sparse_corpus.document_titles),
     )
     retrieve_sparse_mock.assert_called_once_with(
         question,
@@ -260,7 +262,7 @@ def test_answer_question_fuses_overlapping_hits_and_cites_fused_sources() -> Non
 
 
 def test_answer_question_can_cite_sparse_only_hit_when_dense_finds_nothing() -> None:
-    sparse_corpus = Mock(spec=SparseCorpus)
+    sparse_corpus = Mock(spec=SparseCorpus, document_titles={make_hit("B8.2.8", 67).chunk.document_id: "Sporting Regulations"})
     sparse_only = make_hit("B8.2.8", 67)
     question = "What is the penalty under B8.2.8?"
     draft = "The clause provides the answer [S1]."
@@ -312,7 +314,7 @@ def test_answer_question_reranks_twenty_fused_candidates_before_context() -> Non
     question = "Which Power Unit rule applies?"
     openai_client = Mock(spec=OpenAI)
     qdrant_client = Mock(spec=QdrantClient)
-    sparse_corpus = Mock(spec=SparseCorpus)
+    sparse_corpus = Mock(spec=SparseCorpus, document_titles={make_hit("B8.2.8", 67).chunk.document_id: "Sporting Regulations"})
     dense_hits = [make_hit(f"B8.2.{number}", 67) for number in range(1, 21)]
     sparse_hits = [
         SparseHit(hit.chunk, 10.0, hit.document_title) for hit in dense_hits
@@ -363,6 +365,7 @@ def test_answer_question_reranks_twenty_fused_candidates_before_context() -> Non
         collection_name="fia_regulations",
         top_k=20,
         section="B",
+        document_ids=tuple(sparse_corpus.document_titles),
     )
     retrieve_sparse_mock.assert_called_once_with(
         question,
@@ -434,7 +437,7 @@ def test_answer_question_uses_fused_hits_if_reranking_fails(
             qdrant_client=Mock(spec=QdrantClient),
             collection_name="fia_regulations",
             model="answer-model",
-            sparse_corpus=Mock(spec=SparseCorpus),
+            sparse_corpus=Mock(spec=SparseCorpus, document_titles={make_hit("B8.2.8", 67).chunk.document_id: "Sporting Regulations"}),
             rerank_model="rerank-model",
             top_k=5,
         )

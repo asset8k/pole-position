@@ -15,16 +15,16 @@
       "is_active": true
     },
     {
-      "document_id": "fia-f1-2026-section-b-issue-08",
+      "document_id": "fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca",
       "section": "B",
       "title": "Sporting Regulations",
       "season": 2026,
-      "issue_number": 8,
-      "published_date": "2026-08-05",
-      "wmsc_approval_date": "2026-08-03",
-      "source_path": "regulations/fia_f1_2026_section_b_sporting_regulations_issue_08_2026-08-05.pdf",
-      "sha256": "cbe329807d7803a4db511f80d829de1212d0c6a1c3b327cddb1b841823baa9fd",
-      "page_count": 98,
+      "issue_number": 9,
+      "published_date": "2026-10-01",
+      "wmsc_approval_date": "2026-09-30",
+      "source_path": "regulations/versions/fia-f1-2026-section-b-issue-09-sha-5e156f50f1ca.pdf",
+      "sha256": "5e156f50f1ca529d43551f52e82f5f2872bdfbe088e96fab39b861f6b0704b85",
+      "page_count": 101,
       "is_active": true
     },
     {
@@ -41,15 +41,15 @@
       "is_active": true
     },
     {
-      "document_id": "fia-f1-2026-section-d-issue-07",
+      "document_id": "fia-f1-2026-section-d-issue-08-sha-a130c221d590",
       "section": "D",
       "title": "Financial Regulations (F1 Teams)",
       "season": 2026,
-      "issue_number": 7,
-      "published_date": "2026-06-25",
-      "wmsc_approval_date": "2026-06-23",
-      "source_path": "regulations/fia_f1_2026_section_d_financial_f1_teams_issue_07_2026-06-25.pdf",
-      "sha256": "b38f5a1b2c67edbe3c86e4f7d4adbfce6321504f8733a70201508b99ed4717b5",
+      "issue_number": 8,
+      "published_date": "2026-10-01",
+      "wmsc_approval_date": "2026-09-30",
+      "source_path": "regulations/versions/fia-f1-2026-section-d-issue-08-sha-a130c221d590.pdf",
+      "sha256": "a130c221d590357fb9e1d97ea5d0b0a4cd698107c4d54c86f8d7358f00f8a0b6",
       "page_count": 64,
       "is_active": true
     },
@@ -67,16 +67,16 @@
       "is_active": true
     },
     {
-      "document_id": "fia-f1-2026-section-f-issue-10",
+      "document_id": "fia-f1-2026-section-f-issue-11-sha-382b1b5bdb49",
       "section": "F",
       "title": "Operational Regulations",
       "season": 2026,
-      "issue_number": 10,
-      "published_date": "2026-08-05",
-      "wmsc_approval_date": "2026-08-03",
-      "source_path": "regulations/fia_f1_2026_section_f_operational_regulations_issue_10_2026-08-05.pdf",
-      "sha256": "c53c9f07e6313d0c0a0263204d745ba1f99e8c496286924a2166bc66dac38845",
-      "page_count": 32,
+      "issue_number": 11,
+      "published_date": "2026-10-01",
+      "wmsc_approval_date": "2026-09-30",
+      "source_path": "regulations/versions/fia-f1-2026-section-f-issue-11-sha-382b1b5bdb49.pdf",
+      "sha256": "382b1b5bdb495721c0e4339d89f7a4e0e16844686375082035cead8f12674266",
+      "page_count": 49,
       "is_active": true
     }
   ]

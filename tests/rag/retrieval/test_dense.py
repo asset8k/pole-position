@@ -71,6 +71,7 @@ def test_retrieve_dense_returns_ranked_chunk_and_citation_metadata() -> None:
             qdrant_client=client,
             collection_name="regulations",
             top_k=5,
+            document_ids=(document.document_id,),
         )
 
     embed_mock.assert_called_once_with(openai_client, ["power unit allocation?"])
@@ -112,6 +113,7 @@ def test_retrieve_dense_applies_section_filter() -> None:
             collection_name="regulations",
             top_k=1,
             section="B",
+            document_ids=(document.document_id,),
         )
 
     assert len(hits) == 1
@@ -186,6 +188,7 @@ def test_retrieve_dense_passes_named_vector_and_filter_to_qdrant() -> None:
             collection_name="regulations",
             top_k=3,
             section="B",
+            document_ids=("test-document",),
         )
 
     assert hits == []
@@ -197,6 +200,7 @@ def test_retrieve_dense_passes_named_vector_and_filter_to_qdrant() -> None:
     assert kwargs["with_vectors"] is False
     assert kwargs["query_filter"] == models.Filter(
         must=[
+            models.FieldCondition(key="document_id", match=models.MatchAny(any=["test-document"])),
             models.FieldCondition(
                 key="section",
                 match=models.MatchValue(value="B"),
