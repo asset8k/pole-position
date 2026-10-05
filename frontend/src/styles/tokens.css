@@ -1,0 +1,47 @@
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-Variable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  src: url('/fonts/BarlowCondensed-SemiBold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  --font-ui: 'Hanken Grotesk', Arial, sans-serif;
+  --font-brand: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --color-ink: #101114;
+  --color-text: #f4f1ed;
+  --color-muted: #b7b4b3;
+  --color-subtle: #969399;
+  --color-red: #ed302b;
+  --color-action: #d82722;
+  --color-action-hover: #e12621;
+  --color-error: #ffaaa3;
+  --color-focus: #fff1d7;
+  --glass-edge: rgba(255, 255, 255, .16);
+  --glass-clear: rgba(65, 61, 64, .34);
+  --glass-smoked: rgba(23, 24, 29, .72);
+  --glass-reading: #1b1c21;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, .12), 0 16px 48px rgba(0, 0, 0, .18);
+  --transition-fast: 160ms ease;
+}
