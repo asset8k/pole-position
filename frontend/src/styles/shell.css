@@ -1,0 +1,89 @@
+.app-shell { min-height: 100svh; display: flex; flex-direction: column; position: relative; isolation: isolate; overflow: clip; }
+.ambient { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: radial-gradient(ellipse at 75% 60%, #64242a42, transparent 60%), radial-gradient(ellipse at 8% 97%, #ada79518, transparent 55%), var(--color-ink); }
+.ambient::before { content: ''; position: absolute; width: 1100px; height: 510px; top: 39%; left: calc(50% - 130px); border-radius: 50%; border: 55px solid #c6242020; transform: rotate(-25deg); filter: blur(35px); }
+.ambient__ribbon { position: absolute; width: 1150px; height: 440px; left: calc(50% - 400px); top: 57%; border: 1px solid #ed92801a; border-top: 10px solid #ea594e38; border-bottom: 4px solid #eaa9a521; border-radius: 50%; transform: rotate(-25deg); box-shadow: 0 -20px 70px #f3443917, inset 0 20px 40px #f3554b12; }
+.app-header { position: relative; z-index: 2; width: min(calc(100% - 96px), 1312px); margin: 28px auto 0; display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 48px; }
+.brand-home { background: none; color: inherit; border: 0; padding: 6px 0; border-radius: 5px; display: inline-flex; }
+.desktop-nav { display: flex; align-items: center; padding: 4px; border: 1px solid #ffffff15; border-radius: var(--radius-pill); background: #ffffff04; -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 #ffffff06; }
+.nav-button { color: var(--color-muted); font-size: 12px; min-height: 38px; padding: 9px 16px; gap: 8px; }
+.nav-button svg { width: 16px; height: 16px; }
+.nav-divider { width: 1px; height: 16px; background: #ffffff18; }
+.mobile-nav { display: none; position: relative; }
+.mobile-nav__panel { position: absolute; right: 0; top: calc(100% + 12px); min-width: 196px; padding: 8px; display: grid; gap: 4px; box-shadow: var(--shadow-glass), 0 16px 48px #0008; }
+.mobile-nav__panel .button { justify-content: flex-start; border-radius: var(--radius-sm); width: 100%; }
+.icon-button { width: 44px; height: 44px; padding: 0; flex-shrink: 0; }
+.app-main { display: grid; place-items: center; flex: 1; padding: 100px 24px 116px; }
+.welcome { width: min(100%, 744px); text-align: center; }
+.welcome__intro { margin-bottom: 40px; }
+.edition { display: inline-flex; align-items: center; gap: 9px; font-size: 12px; letter-spacing: .035em; color: var(--color-muted); padding: 8px 13px; border: 1px solid #ffffff13; border-radius: var(--radius-pill); background: #ffffff03; }
+.edition > span { width: 5px; height: 5px; background: var(--color-red); border-radius: 50%; box-shadow: 0 0 12px #ed302b50; }
+.welcome h1 { font-size: clamp(48px, 6.5vw, 82px); font-weight: 500; line-height: 1.1; letter-spacing: -.065em; margin: 22px 0 18px; }
+.welcome h1 > span { color: #cac5c3; }
+.welcome__intro > p { font-size: 16px; color: var(--color-muted); letter-spacing: -.015em; }
+.welcome__workspace { width: 100%; }
+.composer { padding: 22px 24px 18px; text-align: left; border-radius: 28px; border-color: #ffffff24; background-color: #443b3d36; box-shadow: inset 0 1px 0 #ffffff16, inset 0 -1px 0 #ffffff03, 0 20px 64px #0003; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+.composer:focus-within { border-color: #fff1d78c; box-shadow: inset 0 1px 0 #ffffff16, 0 0 0 3px #fff1d708, 0 20px 64px #0003; }
+.composer__input { display: block; width: 100%; min-height: 66px; max-height: 190px; padding: 4px 2px; border: 0; background: transparent; color: var(--color-text); resize: none; font-size: 17px; line-height: 1.6; scrollbar-width: thin; }
+.composer__input::placeholder { color: #c1b8ba; opacity: 1; }
+.composer__input:focus-visible { outline: 0; } /* The entire composer supplies the visible focus ring. */
+.composer__footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 12px; }
+.composer__hint { color: #bcb3b6; font-size: 11px; line-height: 1.5; }
+.composer__hint > span { margin-inline: 4px; }
+.composer__count { font-size: 11px; color: var(--color-muted); font-variant-numeric: tabular-nums; margin-left: auto; }
+.composer__send { width: 46px; height: 46px; min-height: 46px; margin-left: auto; }
+.composer__send svg { width: 21px; height: 21px; }
+.suggestions { margin: 20px 0 0; padding: 0; list-style: none; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.suggestion { display: inline-flex; align-items: center; gap: 9px; min-height: 42px; padding: 10px 15px; border: 1px solid #ffffff19; border-radius: var(--radius-pill); background: #19191d50; color: #c8c3c5; font-size: 12px; transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast); }
+.suggestion:hover { background: #ffffff09; border-color: #ffffff3d; color: var(--color-text); }
+.suggestion svg { width: 16px; height: 16px; color: #a9a4a8; }
+.suggestion .suggestion__arrow { width: 12px; height: 12px; margin-left: 2px; color: #898389; }
+.welcome__status { min-height: 18px; max-width: 460px; margin: 22px auto 0; font-size: 11px; line-height: 1.6; color: var(--color-subtle); }
+.app-footer { width: min(calc(100% - 96px), 1312px); margin: 0 auto; padding-bottom: 26px; display: flex; justify-content: space-between; align-items: center; gap: 24px; color: var(--color-subtle); font-size: 10px; line-height: 1.6; }
+.app-footer__edition { font-size: 9px; font-weight: 500; letter-spacing: .13em; white-space: nowrap; }
+.dialog { width: min(480px, calc(100% - 32px)); max-height: calc(100svh - 48px); padding: 0; border: 1px solid #ffffff2b; border-radius: var(--radius-lg); color: var(--color-text); background: #202126f5; box-shadow: inset 0 1px 0 #ffffff12, 0 28px 100px #0008; }
+.dialog::backdrop { background: #07080cb8; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.dialog__content { padding: 24px; }
+.dialog__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.dialog__header h2 { font-size: 24px; font-weight: 500; letter-spacing: -.035em; }
+.dialog__header .button { color: var(--color-muted); }
+.dialog__body { display: grid; gap: 16px; font-size: 15px; line-height: 1.6; color: var(--color-muted); }
+.dialog__note { border-top: 1px solid #ffffff14; padding-top: 16px; font-size: 11px; color: var(--color-subtle); }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .composer { background: #302a2d; }
+  .desktop-nav { background: #202126; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .composer, .desktop-nav { background: #25252b; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .dialog::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (max-width: 720px) {
+  .app-header { width: calc(100% - 40px); margin-top: 20px; min-height: 44px; }
+  .desktop-nav { display: none; }
+  .mobile-nav { display: block; }
+  .app-main { padding: 72px 20px 88px; }
+  .welcome__intro { margin-bottom: 32px; }
+  .welcome h1 { font-size: clamp(43px, 10.5vw, 65px); margin-top: 24px; }
+  .welcome__intro > p { font-size: 14px; }
+  .composer { border-radius: 24px; padding: 18px 18px 16px; }
+  .composer__input { font-size: 16px; min-height: 82px; }
+  .composer__hint { max-width: 185px; }
+  .suggestions { gap: 8px; margin-top: 18px; }
+  .suggestion { min-height: 44px; padding-inline: 12px; gap: 7px; }
+  .suggestion .suggestion__arrow { display: none; }
+  .welcome__status { margin-top: 18px; max-width: 280px; }
+  .app-footer { width: calc(100% - 40px); padding-bottom: max(20px, env(safe-area-inset-bottom)); justify-content: center; text-align: center; }
+  .app-footer > span:first-child { max-width: 270px; }
+  .app-footer__edition { display: none; }
+  .ambient__ribbon { top: 63%; left: calc(50% - 275px); width: 800px; height: 330px; }
+}
+@media (max-width: 380px) {
+  .brand__wordmark { font-size: 22px; }
+  .brand__mark { width: 28px; }
+  .brand { gap: 8px; }
+  .suggestion { padding-inline: 10px; gap: 6px; font-size: 11px; }
+  .suggestion svg { width: 14px; height: 14px; }
+}
+@media (max-height: 650px) and (min-width: 721px) {
+  .app-main { padding-block: 48px; }
+}

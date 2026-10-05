@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('loads local fonts, renders without errors, and captures the visual system', async ({ page }, testInfo) => {
+test('loads local fonts, renders without errors, and captures the welcome screen', async ({ page }, testInfo) => {
   const errors: string[] = [];
   const requests: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -22,34 +22,32 @@ test('loads local fonts, renders without errors, and captures the visual system'
   expect(requests.some((url) => url.endsWith('/fonts/BarlowCondensed-SemiBold.woff2'))).toBe(true);
   expect(requests.every((url) => new URL(url).hostname === '127.0.0.1')).toBe(true);
   expect(errors).toEqual([]);
-  await page.screenshot({ path: testInfo.outputPath('foundation.png'), fullPage: true, animations: 'disabled' });
+  await page.screenshot({ path: testInfo.outputPath('welcome.png'), fullPage: true, animations: 'disabled' });
 });
 
-test('keyboard focus is visible and the preview controls work without API calls', async ({ page }, testInfo) => {
-  const apiRequests: string[] = [];
-  page.on('request', (request) => { if (request.url().includes('/api/')) apiRequests.push(request.url()); });
+test('skip navigation reaches the composer with a visible focus ring', async ({ page }, testInfo) => {
   await page.goto('/');
+  const composer = page.locator('.composer');
+  const initialBorder = await composer.evaluate((element) => getComputedStyle(element).borderColor);
   await page.keyboard.press('Tab');
-  const input = page.getByRole('textbox', { name: 'Question preview' });
+  await expect(page.getByRole('link', { name: 'Skip to question' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  const input = page.getByRole('textbox', { name: 'Your question' });
   await expect(input).toBeFocused();
-  expect(await input.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe('solid');
+  await expect.poll(() => composer.evaluate((element) => getComputedStyle(element).borderColor)).not.toBe(initialBorder);
   await input.fill('How many tyre specifications?');
   await page.keyboard.press('Tab');
-  const preview = page.getByRole('button', { name: 'Preview' });
-  await expect(preview).toBeFocused();
+  const send = page.getByRole('button', { name: 'Send question' });
+  await expect(send).toBeFocused();
+  expect(await send.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe('solid');
   await page.screenshot({ path: testInfo.outputPath('controls-focus.png'), fullPage: true, animations: 'disabled' });
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('status')).toHaveText('Controls ready. Chat comes next.');
-  await page.getByRole('button', { name: 'Reset' }).click();
-  await expect(preview).toBeDisabled();
-  expect(apiRequests).toEqual([]);
 });
 
 test('primary button text has sufficient contrast at rest and on hover', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   await page.getByRole('textbox').fill('A question');
-  const button = page.getByRole('button', { name: 'Preview' });
+  const button = page.getByRole('button', { name: 'Send question' });
   const contrast = async () => button.evaluate((element) => {
     const luminance = (color: string) => {
       const channels = color.match(/[\d.]+/g)!.slice(0, 3).map(Number)
@@ -73,7 +71,10 @@ test('fits narrow viewports and honors reduced motion', async ({ page }) => {
     await page.goto('/');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await expect(page.getByRole('textbox')).toBeVisible();
+    const bounds = await page.getByRole('textbox').boundingBox();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
   }
-  expect(await page.getByRole('button', { name: 'Reset' })
+  expect(await page.getByRole('button', { name: 'Send question' })
     .evaluate((element) => getComputedStyle(element).transitionDuration)).toBe('0s');
 });
