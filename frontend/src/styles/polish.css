@@ -27,6 +27,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 24px; }
   .button { background: ButtonFace; color: ButtonText; }
   .chat-jump .button { background: ButtonFace; color: ButtonText; }
   .citation-button, .source-chip, .source-chip > span:first-child, .brand__period { color: LinkText; }
+  .source-official-link { color: LinkText; background: Canvas; border-color: LinkText; box-shadow: none; }
+  .source-official-link svg { color: LinkText; }
   .composer__hint, .composer__input::placeholder, .input::placeholder, .suggestion, .suggestion svg, .account-avatar { color: CanvasText; }
   .conversation-row--selected { border: 2px solid Highlight; }
   :focus-visible { outline-color: Highlight; }

@@ -31,9 +31,14 @@ test('built assets, local fonts, guest follow-up and citations work without the 
   ]);
   await page.getByRole('group', { name: 'Sources' }).last().getByRole('button').click();
   await expect(page.getByRole('dialog', { name: 'Source S1' })).toContainText('PDF page 58');
+  await page.evaluate(async () => {
+    await Promise.all(document.getAnimations().filter((animation) => animation.effect?.getComputedTiming().iterations !== Infinity)
+      .map((animation) => animation.finished.catch(() => undefined)));
+  });
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
   expect(result.violations).toEqual([]);
   await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Source S1' })).toHaveCount(0);
   expect(await page.evaluate(() => [...document.scripts].map((script) => script.src).filter(Boolean).every((src) => new URL(src).pathname.startsWith('/assets/')))).toBe(true);
   expect(failed).toEqual([]);
   expect(errors).toEqual([]);

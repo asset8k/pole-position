@@ -26,6 +26,7 @@ test('formatted citations open their own excerpt with modal focus and Escape res
   const drawer = page.getByRole('dialog', { name: 'Source S1' });
   const close = drawer.getByRole('button', { name: 'Close source' });
   const details = drawer.getByRole('region', { name: 'Source details' });
+  const official = drawer.getByRole('link', { name: /Full regulations/ });
   await expect(drawer).toBeVisible();
   await expect(close).toBeFocused();
   await expect(drawer.getByText('Sporting Regulations', { exact: true })).toBeVisible();
@@ -34,10 +35,15 @@ test('formatted citations open their own excerpt with modal focus and Escape res
   await page.keyboard.press('Tab');
   await expect(details).toBeFocused();
   await page.keyboard.press('Tab');
+  await expect(official).toBeFocused();
+  await page.keyboard.press('Tab');
   await expect(close).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(official).toBeFocused();
   await page.keyboard.press('Shift+Tab');
   await expect(details).toBeFocused();
   expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe('hidden');
+  await drawer.evaluate((element) => Promise.all(element.getAnimations().map((motion) => motion.finished)));
   const bounds = (await drawer.boundingBox())!;
   const viewport = page.viewportSize()!;
   expect(bounds.x).toBeGreaterThanOrEqual(0);
@@ -95,9 +101,11 @@ test('long appendix excerpts remain complete and keyboard-scrollable', async ({ 
   await expect(page.getByRole('dialog').getByText('PDF pages 86–87', { exact: true })).toBeVisible();
   expect(await page.locator('.source-excerpt p').textContent()).toBe(snippet);
   const details = page.getByRole('region', { name: 'Source details' });
+  await expect(page.getByRole('link', { name: /Full regulations/ })).toBeInViewport();
   await details.focus();
   await page.keyboard.press('End');
   await expect.poll(() => details.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  await expect(page.getByRole('link', { name: /Full regulations/ })).toBeInViewport();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
@@ -117,6 +125,7 @@ test('preamble and empty-citation answers do not invent clause metadata or sourc
   await page.locator('.answer-content').getByRole('button', { name: 'View source S1: Preamble' }).click();
   await expect(page.getByRole('dialog').getByText('Preamble', { exact: true })).toBeVisible();
   await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await ask(page, 'An unknown fact?');
   const newest = page.locator('.chat-message--assistant').last();
   await expect(newest).toContainText('There is not enough evidence to answer. [S99]');
@@ -154,6 +163,7 @@ test('tables and source controls stay inside narrow viewports', async ({ page })
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.locator('.answer-content').getByRole('button', { name: /View source S1/ }).click();
     const drawer = page.getByRole('dialog');
+    await drawer.evaluate((element) => Promise.all(element.getAnimations().map((motion) => motion.finished)));
     const bounds = (await drawer.boundingBox())!;
     expect(bounds.x).toBeGreaterThanOrEqual(0);
     expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);

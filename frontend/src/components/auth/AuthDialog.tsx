@@ -5,6 +5,7 @@ import { AccountCreatedError, authErrorMessage } from '../../auth/useSession';
 import { Button } from '../ui/Button';
 import { Dialog } from '../ui/Dialog';
 import { Input } from '../ui/Input';
+import { useEntranceMotion } from '../../hooks/useEntranceMotion';
 
 export function AuthDialog({ session, onClose, trigger }: {
   session: Session; onClose: () => void; trigger: HTMLElement | null;
@@ -17,14 +18,15 @@ export function AuthDialog({ session, onClose, trigger }: {
   const [pending, setPending] = useState(false);
   const locked = useRef(false);
   const attempt = useRef(0);
+  const formRef = useRef<HTMLFormElement>(null);
+  useEntranceMotion(formRef, mode);
   const usernameError = /^[a-z0-9_]{3,50}$/.test(username) ? '' : 'Use 3–50 lowercase letters, numbers, or underscores.';
   const passwordError = password.length >= 8 ? '' : 'Use at least 8 characters.';
 
-  function close() {
+  function cancel() {
     attempt.current++;
     session.cancelAuthentication();
     setPassword('');
-    onClose();
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -50,8 +52,8 @@ export function AuthDialog({ session, onClose, trigger }: {
   }
 
   return <Dialog open title={mode === 'login' ? 'Welcome back.' : 'Your place on the grid.'}
-    closeLabel="Close sign in" returnFocusTo={trigger} onClose={close}>
-    <form className="auth-form" onSubmit={(event) => { void submit(event); }} noValidate aria-busy={pending}>
+    closeLabel="Close sign in" returnFocusTo={trigger} onClose={onClose} onDismissStart={cancel}>
+    <form ref={formRef} className="auth-form" onSubmit={(event) => { void submit(event); }} noValidate aria-busy={pending}>
       <p className="auth-form__intro">{mode === 'login' ? 'Sign in to keep your conversations.' : 'Create an account. Keep your conversations.'}</p>
       <Input label="Username" name="username" autoComplete="username" autoCapitalize="none" spellCheck={false}
         value={username} maxLength={50} readOnly={pending} error={submitted ? usernameError : undefined}

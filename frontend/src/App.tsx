@@ -14,6 +14,7 @@ import type { ConversationAction } from './components/chat/ConversationList';
 import { ConversationActionDialog } from './components/chat/ConversationActionDialog';
 import { Dialog } from './components/ui/Dialog';
 import { useVisualViewport } from './hooks/useVisualViewport';
+import { useEntranceMotion } from './hooks/useEntranceMotion';
 
 export function App() {
   useVisualViewport();
@@ -37,6 +38,10 @@ function Workspace({ session }: { session: Session }) {
   const authenticated = session.status === 'authenticated';
   const showWelcome = chat.selectedId === null && chat.messages.length === 0 && chat.activeTurn === null;
   const selected = saved.items.find((item) => item.id === chat.selectedId);
+  const screenIdentity = ['restoring', 'unavailable'].includes(session.status) ? session.status
+    : chat.loadState ? `conversation:${chat.selectedId}:${chat.loadState.status}`
+    : showWelcome ? 'welcome' : `chat:${chat.selectedId ?? 'new'}`;
+  useEntranceMotion(mainRef, screenIdentity);
 
   useLayoutEffect(() => {
     if (focusRequest > 0) (composerRef.current ?? mainRef.current)?.focus();
@@ -85,7 +90,7 @@ function Workspace({ session }: { session: Session }) {
       {session.notice && <p className="session-notice" role="alert">{session.notice}</p>}
       <div className={`workspace-layout${authenticated ? ' workspace-layout--saved' : ''}`}>
       {authenticated && <aside className="conversation-sidebar glass glass--smoked" aria-label="Your saved chats">{conversationList}</aside>}
-      <main ref={mainRef} tabIndex={-1} className={`app-main${showWelcome ? '' : ' app-main--chat'}`} id="main-content">
+      <main ref={mainRef} tabIndex={-1} className={`app-main${showWelcome ? '' : ' app-main--chat'}`} id="main-content" data-screen={screenIdentity}>
         {session.status === 'restoring' || session.status === 'unavailable' ? <section className="session-check" aria-label="Session verification">
           {session.status === 'restoring' ? <p role="status"><span className="spinner" aria-hidden="true" />Checking your session…</p>
             : <><h1>Let’s reconnect.</h1><div><Button onClick={() => { void session.restore(); }}>Retry</Button>

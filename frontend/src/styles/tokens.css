@@ -44,4 +44,5 @@
   --space-8: 64px;
   --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, .12), 0 16px 48px rgba(0, 0, 0, .18);
   --transition-fast: 160ms ease;
+  --ease-surface: cubic-bezier(.22, 1, .36, 1);
 }

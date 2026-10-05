@@ -96,6 +96,7 @@ test('reopening restores messages/citations; authenticated follow-ups persist ac
   await page.getByRole('group', { name: 'Sources' }).getByRole('button').click();
   await expect(page.getByRole('dialog', { name: 'Source S1' })).toContainText('PDF page 58');
   await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Source S1' })).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath('saved-conversation.png'), fullPage: true });
   await ask(page, 'What happens if they fail?');
   await expect(page.getByRole('log')).toContainText('Latest answer for Tyre rules.');

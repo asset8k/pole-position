@@ -1,0 +1,34 @@
+/* Calm, short motion: the header and ambient background stay anchored. */
+.dialog[open] { animation: dialog-enter 260ms var(--ease-surface); }
+.dialog[open]::backdrop { animation: backdrop-enter 240ms ease-out; transition: background 180ms ease, backdrop-filter 180ms ease; }
+.dialog[data-closing]::backdrop { background: transparent; -webkit-backdrop-filter: blur(0); backdrop-filter: blur(0); }
+.source-drawer[open] { animation: drawer-enter 340ms var(--ease-surface); }
+.chat-message--assistant, .chat-error, .session-notice { animation: content-enter 300ms var(--ease-surface); }
+
+@keyframes content-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes dialog-enter { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes drawer-enter { from { opacity: 0; transform: translateX(36px); } to { opacity: 1; transform: none; } }
+@keyframes backdrop-enter { from { background: transparent; -webkit-backdrop-filter: blur(0); backdrop-filter: blur(0); } }
+
+/* Native discrete transitions preserve exit motion without retaining interactive
+   menus. Unsupported browsers simply hide them; hidden/inert apply immediately. */
+.account-panel, .mobile-nav__panel {
+  opacity: 1; transform: translateY(0); transform-origin: top right;
+  transition: opacity 180ms ease, transform 220ms var(--ease-surface), display 220ms allow-discrete;
+}
+.account-panel[hidden], .mobile-nav__panel[hidden] { display: none; opacity: 0; transform: translateY(-6px); }
+@starting-style {
+  .account-panel:not([hidden]), .mobile-nav__panel:not([hidden]) { opacity: 0; transform: translateY(-6px); }
+}
+
+.conversation-row, .citation-button, .source-chip {
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+@media (max-width: 720px) {
+  @keyframes drawer-enter { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: none; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dialog, .dialog::backdrop, .source-drawer, .chat-message--assistant, .chat-error, .session-notice {
+    animation: none !important;
+  }
+}

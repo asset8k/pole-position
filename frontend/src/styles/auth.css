@@ -7,7 +7,8 @@
 .account-panel { position: absolute; right: 0; top: calc(100% + 12px); width: 248px; padding: 18px; box-shadow: var(--shadow-glass), 0 20px 60px #0009; }
 .account-panel__label { font-size: 9px; letter-spacing: .12em; color: var(--color-muted); }
 .account-panel__username { color: var(--color-text); margin: 8px 0 16px; overflow-wrap: anywhere; font-size: 16px; }
-.account-panel .button { justify-content: flex-start; width: 100%; border-top: 1px solid #ffffff18; border-radius: 0; padding: 14px 0 0; }
+.account-panel__actions { border-top: 1px solid #ffffff18; padding-top: 10px; }
+.account-panel .button { justify-content: flex-start; width: 100%; border-radius: var(--radius-pill); padding: 11px 14px; }
 .auth-form { display: grid; gap: 20px; }
 .auth-form__intro { margin-top: -10px; font-size: 14px; }
 .auth-form__submit { width: 100%; margin-top: 4px; min-height: 48px; }

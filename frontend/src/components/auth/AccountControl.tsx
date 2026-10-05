@@ -31,10 +31,12 @@ export function AccountControl({ session, onSignIn }: {
       <span className="account-avatar" aria-hidden="true">{session.user.username.slice(0, 1).toUpperCase()}</span>
       <span className="account-trigger__name">{session.user.username}</span>
     </Button>
-    {open && <section id="account-panel" className="account-panel glass glass--smoked" aria-label="Your account">
+    <section id="account-panel" className="account-panel glass glass--smoked" aria-label="Your account" hidden={!open} inert={!open || undefined}>
       <span className="account-panel__label">SIGNED IN AS</span>
       <p className="account-panel__username">{session.user.username}</p>
-      <Button ref={logout} variant="quiet" onClick={() => session.logout('Signed out. Your saved conversations remain in your account.')}>Sign out</Button>
-    </section>}
+      <div className="account-panel__actions">
+        <Button ref={logout} variant="quiet" onClick={() => session.logout('Signed out. Your saved conversations remain in your account.')}>Sign out</Button>
+      </div>
+    </section>
   </div>;
 }

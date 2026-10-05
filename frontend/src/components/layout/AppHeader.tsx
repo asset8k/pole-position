@@ -63,8 +63,7 @@ export function AppHeader({ onNewChat, account, onOpenHistory }: {
           aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)}>
           <Icon name={menuOpen ? 'close' : 'menu'} />
         </Button>
-        {menuOpen && (
-          <nav className="mobile-nav__panel glass glass--smoked" aria-label="Mobile navigation" id="mobile-navigation">
+          <nav className="mobile-nav__panel glass glass--smoked" aria-label="Mobile navigation" id="mobile-navigation" hidden={!menuOpen} inert={!menuOpen || undefined}>
             <Button ref={firstItemRef} variant="quiet" onClick={startNewChat}><Icon name="plus" />New chat</Button>
             {onOpenHistory && <Button variant="quiet" onClick={() => {
               setMenuOpen(false);
@@ -76,7 +75,6 @@ export function AppHeader({ onNewChat, account, onOpenHistory }: {
               setAboutOpen(true);
             }}><Icon name="info" />About</Button>
           </nav>
-        )}
       </div>
       {account}
       </div>

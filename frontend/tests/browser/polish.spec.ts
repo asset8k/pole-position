@@ -6,6 +6,11 @@ import { citation } from '../../src/test/citations';
 import { conversationDetail } from '../../src/test/conversations';
 
 async function scan(page: Page) {
+  // Contrast checks must inspect the settled surface, not an intermediate fade.
+  // Loading spinners are intentionally infinite and must not block the scan.
+  await page.evaluate(() => Promise.all(document.getAnimations()
+    .filter((motion) => motion.effect?.getComputedTiming().endTime !== Infinity)
+    .map((motion) => motion.finished.catch(() => {}))));
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
   expect(result.violations.map(({ id, nodes }) => ({ id, nodes: nodes.map(({ target, failureSummary }) => ({ target, failureSummary })) }))).toEqual([]);
 }
@@ -70,6 +75,7 @@ test('complete mocked guest/account journey and accessibility scans', async ({ p
   await scan(page);
   await page.screenshot({ path: info.outputPath('source-final.png'), animations: 'disabled' });
   await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Source S1' })).toHaveCount(0);
   await ask(page, 'And the penalty?');
   await expect(page.getByRole('group', { name: 'Sources' })).toHaveCount(2);
   expect(chats[1].body.history).toHaveLength(2);
@@ -169,6 +175,7 @@ test('short screens, zoom-equivalent reflow and high-contrast/reduced-glass pref
     await dialog.getByLabel('Password').fill('password123');
     await expect(dialog.getByRole('button', { name: 'Sign in', exact: true })).toBeInViewport();
     await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await ask(page, 'Tyres');

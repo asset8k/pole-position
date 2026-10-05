@@ -39,13 +39,13 @@ test('Enter submits; Shift+Enter keeps multiline editing', async ({ page }) => {
 test('composer grows for multiline drafts, caps its height, and shrinks again', async ({ page }) => {
   await page.goto('/');
   const input = page.getByRole('textbox');
-  const initialHeight = (await input.boundingBox())!.height;
+  const initialHeight = await input.evaluate((element) => element.clientHeight);
   await input.fill(Array.from({ length: 12 }, (_, index) => `Line ${index}`).join('\n'));
-  const expandedHeight = (await input.boundingBox())!.height;
+  const expandedHeight = await input.evaluate((element) => element.clientHeight);
   expect(expandedHeight).toBeGreaterThan(initialHeight);
   expect(expandedHeight).toBeLessThanOrEqual(190);
   await input.fill('');
-  expect((await input.boundingBox())!.height).toBe(initialHeight);
+  expect(await input.evaluate((element) => element.clientHeight)).toBe(initialHeight);
 });
 
 test('navigation resets the draft and About traps and restores focus', async ({ page }, testInfo) => {

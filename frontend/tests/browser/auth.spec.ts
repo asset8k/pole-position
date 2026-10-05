@@ -74,6 +74,7 @@ test('auth forms are compact, keyboard-accessible, responsive, and dismiss with 
     expect(box!.x + box!.width).toBeLessThanOrEqual(width);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.keyboard.press('Escape');
+    await expect(modal).not.toBeVisible();
   }
   expect(requests).toEqual([]);
 });

@@ -9,6 +9,7 @@ import './styles/answers.css';
 import './styles/auth.css';
 import './styles/conversations.css';
 import './styles/polish.css';
+import './styles/motion.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode><App /></StrictMode>,
