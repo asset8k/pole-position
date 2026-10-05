@@ -6,6 +6,9 @@ import './styles/global.css';
 import './styles/shell.css';
 import './styles/chat.css';
 import './styles/answers.css';
+import './styles/auth.css';
+import './styles/conversations.css';
+import './styles/polish.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode><App /></StrictMode>,

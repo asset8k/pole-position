@@ -1,7 +1,7 @@
 .answer-content { font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; }
 .answer-content > * + * { margin-top: 16px; }
 .answer-content strong { font-weight: 650; }
-.answer-content h3 { font-size: 18px; font-weight: 600; letter-spacing: -.02em; margin: 22px 0 12px; }
+.answer-content h2 { font-size: 18px; font-weight: 600; letter-spacing: -.02em; margin: 22px 0 12px; }
 .answer-content > :first-child { margin-top: 0; }
 .answer-content ul, .answer-content ol { padding-left: 24px; margin-bottom: 0; }
 .answer-content li + li { margin-top: 6px; }

@@ -43,6 +43,7 @@ interface JsonRequestOptions extends RequestOptions {
 export interface ApiClientOptions {
   baseUrl?: string;
   fetch?: typeof globalThis.fetch;
+  onUnauthorized?: (token: string) => void;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -131,7 +132,10 @@ export function createApiClient(options: ApiClientOptions = {}) {
       try { data = JSON.parse(text); }
       catch { if (response.ok) throw new ResponseError(response.status); }
     }
-    if (!response.ok) throw httpError(response.status, data);
+    if (!response.ok) {
+      if (response.status === 401 && requestOptions.token) options.onUnauthorized?.(requestOptions.token);
+      throw httpError(response.status, data);
+    }
     if (!isJson || !text) throw new ResponseError(response.status);
     // TypeScript describes the backend contract, not runtime schema validation.
     return data as T;

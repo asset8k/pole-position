@@ -1,0 +1,33 @@
+html { scrollbar-gutter: stable; scroll-padding-block: 24px; }
+.skip-link { clip-path: inset(50%); pointer-events: none; }
+.skip-link:focus { clip-path: none; pointer-events: auto; }
+.app-shell { min-height: 100svh; }
+.chat-composer { z-index: 1; }
+.chat-jump { display: flex; justify-content: center; margin-bottom: 12px; }
+.chat-jump .button { font-size: 12px; min-height: 40px; background: #29272df5; }
+.composer__input { max-height: min(190px, calc(var(--visual-height, 100dvh) * .3)); }
+.dialog:not(.source-drawer) { top: var(--visual-top, 0px); bottom: var(--visual-bottom, 0px); max-height: calc(var(--visual-height, 100dvh) - 32px); overscroll-behavior: contain; }
+.source-drawer .dialog__body, .conversation-sidebar, .answer-table, .answer-content pre, .composer__input { overscroll-behavior: contain; }
+.answer-content pre { outline-offset: -3px; }
+.dialog__header h2 { overflow-wrap: anywhere; }
+@media (max-width: 720px) {
+  .chat-composer { bottom: var(--visual-bottom, 0px); padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+  .source-drawer { bottom: var(--visual-bottom, 0px); height: min(calc(var(--visual-height, 100dvh) * .86), 800px); max-height: calc(var(--visual-height, 100dvh) - 24px); }
+  .app-header { padding-top: env(safe-area-inset-top); }
+  .app-footer { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+  .conversation-list__header .icon-button { width: 44px; height: 44px; }
+  .input { font-size: 16px; } /* Avoid focus-triggered text zoom on mobile. */
+}
+@media (forced-colors: active) {
+  :root { --color-ink: Canvas; --color-text: CanvasText; --color-muted: CanvasText; --color-subtle: CanvasText; --color-error: CanvasText; --color-focus: Highlight; --color-red: LinkText; --color-action: ButtonFace; --color-action-hover: ButtonFace; }
+  body { background: Canvas; color: CanvasText; }
+  .ambient { display: none; }
+  .glass, .composer, .dialog, .chat-message, .conversation-row, .source-excerpt, .account-panel { background: Canvas; color: CanvasText; border: 1px solid CanvasText; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .button, .citation-button, .source-chip, .suggestion, .input { border: 1px solid ButtonText; }
+  .button { background: ButtonFace; color: ButtonText; }
+  .chat-jump .button { background: ButtonFace; color: ButtonText; }
+  .citation-button, .source-chip, .source-chip > span:first-child, .brand__period { color: LinkText; }
+  .composer__hint, .composer__input::placeholder, .input::placeholder, .suggestion, .suggestion svg, .account-avatar { color: CanvasText; }
+  .conversation-row--selected { border: 2px solid Highlight; }
+  :focus-visible { outline-color: Highlight; }
+}

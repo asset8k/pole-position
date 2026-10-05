@@ -30,7 +30,7 @@ export function Dialog({ open, title, children, onClose, returnFocusTo, variant 
     return () => {
       dialog.close();
       document.documentElement.style.overflow = previousOverflow;
-      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus({ preventScroll: true });
     };
   }, [open, returnFocusTo]);
 

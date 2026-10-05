@@ -8,13 +8,14 @@ describe('safe answer formatting', () => {
   it('renders headings, emphasis, lists, quotes, and code as semantic elements', () => {
     const content = '# Tyre rules\n\nUse **two** *specifications*.\n\n- Dry tyres\n- Wet tyres\n\n1. First\n2. Second\n\n> Consult the regulations.\n\n`B6.3.6`\n\n```text\n[S1] is code, not a citation\n```';
     const { container } = render(<AnswerContent content={content} citations={[]} onOpenSource={vi.fn()} />);
-    expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent('Tyre rules');
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Tyre rules');
     expect(container.querySelector('h1')).toBeNull();
     expect(container.querySelector('strong')).toHaveTextContent('two');
     expect(container.querySelector('em')).toHaveTextContent('specifications');
     expect(container.querySelectorAll('li')).toHaveLength(4);
     expect(container.querySelector('blockquote')).toHaveTextContent('Consult the regulations.');
     expect(container.querySelector('pre code')).toHaveTextContent('[S1] is code, not a citation');
+    expect(screen.getByRole('region', { name: 'Answer code block' })).toHaveAttribute('tabindex', '0');
   });
 
   it('renders tables inside a keyboard-scrollable region', () => {

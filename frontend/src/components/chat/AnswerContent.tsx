@@ -45,9 +45,10 @@ const markdownComponents: Components = {
   a: ({ children }) => <>{children}</>,
   img: ({ alt }) => <span>{alt}</span>,
   input: ({ checked }) => <input type="checkbox" checked={Boolean(checked)} disabled aria-label="Answer checklist item" />,
-  h1: ({ children }) => <h3>{children}</h3>, h2: ({ children }) => <h3>{children}</h3>,
-  h4: ({ children }) => <h3>{children}</h3>, h5: ({ children }) => <h3>{children}</h3>,
-  h6: ({ children }) => <h3>{children}</h3>,
+  h1: ({ children }) => <h2>{children}</h2>, h2: ({ children }) => <h2>{children}</h2>,
+  h3: ({ children }) => <h2>{children}</h2>, h4: ({ children }) => <h2>{children}</h2>,
+  h5: ({ children }) => <h2>{children}</h2>, h6: ({ children }) => <h2>{children}</h2>,
+  pre: ({ children }) => <pre role="region" aria-label="Answer code block" tabIndex={0}>{children}</pre>,
   table: ({ children }) => <div className="answer-table" role="region" aria-label="Answer table" tabIndex={0}><table>{children}</table></div>,
   cite: InlineCitation,
 };

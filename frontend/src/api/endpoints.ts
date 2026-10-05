@@ -1,4 +1,5 @@
 import { createApiClient } from './client';
+import { reportUnauthorized } from '../auth/sessionEvents';
 import type { ApiClient, RequestOptions } from './client';
 import type {
   ChatRequest, ChatResponse, ConversationDetailResponse, ConversationResponse,
@@ -60,5 +61,5 @@ export function createApi(client: ApiClient = createApiClient()) {
   };
 }
 
-// No token storage or UI side effects here. Session management belongs to Step 6.
-export const api = createApi();
+// Session storage is owned by useSession, never by the transport layer.
+export const api = createApi(createApiClient({ onUnauthorized: reportUnauthorized }));

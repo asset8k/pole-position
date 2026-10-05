@@ -3,8 +3,11 @@ import { Brand } from '../Brand';
 import { Button } from '../ui/Button';
 import { Dialog } from '../ui/Dialog';
 import { Icon } from '../ui/Icon';
+import type { ReactNode } from 'react';
 
-export function AppHeader({ onNewChat }: { onNewChat: () => void }) {
+export function AppHeader({ onNewChat, account, onOpenHistory }: {
+  onNewChat: () => void; account?: ReactNode; onOpenHistory?: (trigger: HTMLElement) => void;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -40,6 +43,7 @@ export function AppHeader({ onNewChat }: { onNewChat: () => void }) {
       <button className="brand-home" aria-label="Go to welcome screen" onClick={startNewChat}>
         <Brand />
       </button>
+      <div className="header-actions">
       <nav className="desktop-nav" aria-label="Primary navigation">
         <Button variant="quiet" className="nav-button" onClick={startNewChat}><Icon name="plus" />New chat</Button>
         <span className="nav-divider" aria-hidden="true" />
@@ -62,6 +66,10 @@ export function AppHeader({ onNewChat }: { onNewChat: () => void }) {
         {menuOpen && (
           <nav className="mobile-nav__panel glass glass--smoked" aria-label="Mobile navigation" id="mobile-navigation">
             <Button ref={firstItemRef} variant="quiet" onClick={startNewChat}><Icon name="plus" />New chat</Button>
+            {onOpenHistory && <Button variant="quiet" onClick={() => {
+              setMenuOpen(false);
+              if (menuButtonRef.current) onOpenHistory(menuButtonRef.current);
+            }}><Icon name="history" />Saved chats</Button>}
             <Button variant="quiet" onClick={() => {
               aboutTriggerRef.current = menuButtonRef.current;
               setMenuOpen(false);
@@ -69,6 +77,8 @@ export function AppHeader({ onNewChat }: { onNewChat: () => void }) {
             }}><Icon name="info" />About</Button>
           </nav>
         )}
+      </div>
+      {account}
       </div>
       <Dialog open={aboutOpen} title="About Pole Position" returnFocusTo={aboutTriggerRef.current}
         onClose={() => setAboutOpen(false)}>

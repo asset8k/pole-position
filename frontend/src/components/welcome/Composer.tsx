@@ -37,7 +37,7 @@ export function Composer({ value, inputRef, onChange, onSubmit, pending = false 
           readOnly={pending} aria-busy={pending || undefined} autoComplete="off" aria-describedby="composer-help"
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+            if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && event.nativeEvent.keyCode !== 229) {
               event.preventDefault();
               submit();
             }

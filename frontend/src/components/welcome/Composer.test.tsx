@@ -54,6 +54,7 @@ describe('Composer', () => {
     expect(submit).not.toHaveBeenCalled();
     await user.type(input, '日本語');
     fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+    fireEvent.keyDown(input, { key: 'Enter', keyCode: 229 });
     expect(submit).not.toHaveBeenCalled();
   });
 });

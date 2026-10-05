@@ -14,7 +14,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:browser": "playwright test",
-    "check": "npm run build && npm test && npm run test:browser"
+    "test:production": "FRONTEND_PREVIEW=1 playwright test",
+    "smoke:live": "node scripts/live-smoke.mjs",
+    "test:scripts": "node --test tests/scripts/*.test.mjs",
+    "check": "npm run build && npm test && npm run test:scripts && npm run test:browser && npm run test:production"
   },
   "dependencies": {
     "react": "19.2.0",
@@ -23,6 +26,7 @@
     "remark-gfm": "4.0.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.58.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { RefObject } from 'react';
 import type { ActiveTurn, GuestMessage } from '../../chat/useGuestChat';
 import { Composer } from '../welcome/Composer';
 import { AnswerContent } from './AnswerContent';
 import { SourceDrawer } from './SourceDrawer';
 import type { SelectedSource } from './SourceDrawer';
+import { useChatScroll } from '../../chat/useChatScroll';
+import { Button } from '../ui/Button';
 
 interface ChatScreenProps {
   messages: GuestMessage[];
@@ -13,10 +15,12 @@ interface ChatScreenProps {
   composerRef: RefObject<HTMLTextAreaElement | null>;
   onChange: (value: string) => void;
   onSubmit: (question: string) => void;
+  authenticated?: boolean;
+  title?: string;
 }
 
-export function ChatScreen({ messages, activeTurn, draft, composerRef, onChange, onSubmit }: ChatScreenProps) {
-  const bottomRef = useRef<HTMLDivElement>(null);
+export function ChatScreen({ messages, activeTurn, draft, composerRef, onChange, onSubmit, authenticated = false, title = 'Regulation chat' }: ChatScreenProps) {
+  const { bottomRef, hasNewMessages, jumpToLatest } = useChatScroll(messages.length, activeTurn?.status);
   const isPending = activeTurn?.status === 'loading';
   const [selectedSource, setSelectedSource] = useState<SelectedSource | null>(null);
   const selection = selectedSource && messages.some((message) => message.id === selectedSource.messageId)
@@ -24,16 +28,15 @@ export function ChatScreen({ messages, activeTurn, draft, composerRef, onChange,
 
   useEffect(() => {
     if (document.querySelector('dialog[open]')) return;
-    bottomRef.current?.scrollIntoView?.({ block: 'end', behavior: 'auto' });
     // Don't take focus from navigation or an open About dialog when a reply lands.
-    if (!isPending && document.activeElement === document.body) composerRef.current?.focus();
-  }, [messages.length, activeTurn?.status, isPending, composerRef]);
+    if (!isPending && !hasNewMessages && document.activeElement === document.body) composerRef.current?.focus({ preventScroll: true });
+  }, [messages.length, activeTurn?.status, isPending, hasNewMessages, composerRef]);
 
   return (
     <section className="chat-screen" aria-labelledby="chat-title">
       <div className="chat-heading">
-        <h1 id="chat-title">Regulation chat</h1>
-        <span className="chat-heading__guest">Guest <span aria-hidden="true">·</span> Clears on refresh</span>
+        <h1 id="chat-title">{title}</h1>
+        <span className="chat-heading__guest">{authenticated ? 'Saved to your account' : <>Guest <span aria-hidden="true">·</span> Clears on refresh</>}</span>
       </div>
       <div role="log" aria-label="Conversation messages" aria-live="polite" aria-relevant="additions">
         <ol className="chat-messages">
@@ -61,6 +64,9 @@ export function ChatScreen({ messages, activeTurn, draft, composerRef, onChange,
         </div>
       )}
       <div className="chat-composer">
+        {hasNewMessages && <div className="chat-jump"><Button variant="glass" onClick={() => {
+          jumpToLatest(); composerRef.current?.focus({ preventScroll: true });
+        }}>Jump to latest</Button></div>}
         <Composer value={draft} inputRef={composerRef} onChange={onChange} onSubmit={onSubmit} pending={isPending} />
       </div>
       <div ref={bottomRef} />

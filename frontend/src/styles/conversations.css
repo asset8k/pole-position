@@ -1,0 +1,48 @@
+.workspace-layout { display: flex; flex: 1; min-width: 0; }
+.workspace-layout > .app-main { min-width: 0; width: 100%; }
+.workspace-layout--saved { gap: 24px; width: min(calc(100% - 96px), 1312px); margin: 32px auto 0; }
+.workspace-layout--saved > .app-main { padding: 64px 16px 84px; }
+.conversation-sidebar { width: 260px; flex: 0 0 260px; align-self: flex-start; position: sticky; top: 24px; padding: 16px 12px; max-height: calc(100dvh - 48px); overflow-y: auto; border-radius: 22px; background: #20202465; }
+.conversation-list { min-width: 0; }
+.conversation-list__header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.conversation-list__header > span { font-size: 10px; letter-spacing: .12em; color: var(--color-muted); margin-left: 10px; }
+.conversation-list__header .icon-button { width: 36px; height: 36px; }
+.conversation-list__new { width: 100%; min-height: 44px; margin-bottom: 18px; gap: 8px; font-size: 12px; }
+.conversation-list__items { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.conversation-list__notice, .conversation-list__empty, .conversation-list__error { font-size: 12px; line-height: 1.6; color: var(--color-muted); padding: 12px 10px; }
+.conversation-list__error .button { font-size: 12px; padding: 8px; min-height: 36px; margin-top: 8px; }
+.conversation-row { display: flex; align-items: center; border: 1px solid transparent; border-radius: 12px; min-width: 0; }
+.conversation-row:hover { background: #ffffff05; }
+.conversation-row--selected { background: #ef555210; border-color: #e8786b28; }
+.conversation-row__open { flex: 1; min-width: 0; text-align: left; background: none; border: 0; color: var(--color-text); padding: 12px 10px; border-radius: 12px; display: grid; gap: 5px; }
+.conversation-row__open > span { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 12px; }
+.conversation-row__open time { font-size: 10px; color: var(--color-muted); }
+.conversation-row__actions { display: flex; padding-right: 4px; }
+.conversation-row__actions .icon-button { width: 30px; height: 36px; min-height: 36px; color: var(--color-muted); }
+.conversation-row__actions svg { width: 15px; height: 15px; }
+.conversation-action { display: grid; gap: 20px; }
+.conversation-action__title { color: var(--color-text); overflow-wrap: anywhere; }
+.conversation-action__buttons { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }
+.conversation-action__error { color: var(--color-error); font-size: 13px; }
+.conversation-loading { display: grid; gap: 24px; max-width: 500px; text-align: center; color: var(--color-muted); font-size: 14px; line-height: 1.7; }
+.conversation-loading > p { display: flex; justify-content: center; align-items: center; gap: 10px; }
+.conversation-loading > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.chat-heading h1 { overflow-wrap: anywhere; min-width: 0; }
+@media (max-width: 1050px) and (min-width: 721px) {
+  .workspace-layout--saved { gap: 16px; width: calc(100% - 48px); }
+  .conversation-sidebar { width: 224px; flex-basis: 224px; }
+  .workspace-layout--saved > .app-main { padding: 56px 0 72px; }
+  .workspace-layout--saved .welcome h1 { font-size: clamp(42px, 6vw, 64px); }
+  .workspace-layout--saved .composer { padding-inline: 18px; }
+  .workspace-layout--saved .composer__hint { max-width: 170px; }
+}
+@media (max-width: 720px) {
+  .workspace-layout--saved { width: 100%; margin: 0; display: block; }
+  .conversation-sidebar { display: none; }
+  .workspace-layout--saved > .app-main { padding: 72px 20px 88px; }
+  .workspace-layout--saved > .app-main--chat { padding: 48px 20px 72px; }
+  .dialog .conversation-row__actions .icon-button { width: 44px; height: 44px; min-height: 44px; }
+  .dialog .conversation-row__open { padding-block: 16px; }
+}
+@media (prefers-reduced-transparency: reduce) { .conversation-sidebar { background: #25252b; } }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .conversation-sidebar { background: #25252b; } }

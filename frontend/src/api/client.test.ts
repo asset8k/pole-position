@@ -7,6 +7,15 @@ function mockClient(response: Response) {
 }
 
 describe('JSON API client', () => {
+  it('reports unauthorized only for protected requests, with the failing token identity', async () => {
+    const onUnauthorized = vi.fn();
+    const fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => Response.json({}, { status: 401 }));
+    const client = createApiClient({ fetch, onUnauthorized });
+    await expect(client.request('/auth/login', { method: 'POST' })).rejects.toBeInstanceOf(ApiError);
+    expect(onUnauthorized).not.toHaveBeenCalled();
+    await expect(client.request('/chat', { token: 'expired-token' })).rejects.toBeInstanceOf(ApiError);
+    expect(onUnauthorized).toHaveBeenCalledExactlyOnceWith('expired-token');
+  });
   it('uses same-origin JSON requests without cookies or guest authorization', async () => {
     const { client, fetch } = mockClient(Response.json({ answer: 'Hello' }));
     expect(await client.request('/chat', { method: 'POST', body: { message: 'Tyres?' } }))

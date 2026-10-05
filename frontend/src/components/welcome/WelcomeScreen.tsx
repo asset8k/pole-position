@@ -9,9 +9,10 @@ type WelcomeScreenProps = {
   onChange: (value: string) => void;
   onSuggestion: (value: string) => void;
   onSubmit: (question: string) => void;
+  authenticated?: boolean;
 };
 
-export function WelcomeScreen({ question, composerRef, onChange, onSuggestion, onSubmit }: WelcomeScreenProps) {
+export function WelcomeScreen({ question, composerRef, onChange, onSuggestion, onSubmit, authenticated = false }: WelcomeScreenProps) {
   return (
     <section className="welcome" aria-labelledby="welcome-title">
       <div className="welcome__intro">
@@ -33,7 +34,7 @@ export function WelcomeScreen({ question, composerRef, onChange, onSuggestion, o
           ))}
         </ul>
         <p className="welcome__status" role="status">
-          Guest chat <span aria-hidden="true">·</span> Clears on refresh
+          {authenticated ? 'Conversations save to your account' : <>Guest chat <span aria-hidden="true">·</span> Clears on refresh</>}
         </p>
       </div>
     </section>
