@@ -1,6 +1,5 @@
 from collections.abc import Iterator
 from functools import lru_cache
-from pathlib import Path
 from typing import Annotated
 
 from fastapi import (
@@ -42,13 +41,17 @@ from pole_position.users.model import User
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = settings.corpus_root.resolve()
 MANIFEST_PATH = PROJECT_ROOT / "data/manifests/2026_f1_regulations.json"
 CHUNKS_DIR = PROJECT_ROOT / "artifacts/chunks"
 
 
 def get_openai_client() -> Iterator[OpenAI]:
-    client = OpenAI(api_key=settings.openai_api_key.get_secret_value())
+    client = OpenAI(
+        api_key=settings.openai_api_key.get_secret_value(),
+        timeout=45.0,
+        max_retries=1,
+    )
     try:
         yield client
     finally:
@@ -59,6 +62,7 @@ def get_qdrant_client() -> Iterator[QdrantClient]:
     client = QdrantClient(
         url=settings.qdrant_url,
         api_key=settings.qdrant_api_key.get_secret_value(),
+        timeout=10,
     )
     try:
         yield client

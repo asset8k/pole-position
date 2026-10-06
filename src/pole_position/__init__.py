@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from pole-position!")
+"""Pole Position: citation-grounded Formula One regulation chat."""

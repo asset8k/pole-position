@@ -365,5 +365,5 @@ def test_local_corpus_artifacts_are_index_ready() -> None:
                 224,
             )
 
-    assert chunk_counts == Counter({"clause": 2411, "appendix": 422, "preamble": 1})
+    assert chunk_counts == Counter({"clause": 2424, "appendix": 432, "preamble": 1})
     assert len(seen_chunk_ids) == sum(chunk_counts.values())

@@ -1,7 +1,7 @@
 [project]
 name = "pole-position"
 version = "0.1.0"
-description = "Add your description here"
+description = "Citation-grounded AI chat for the 2026 FIA Formula One regulations"
 readme = "README.md"
 authors = [
     { name = "Asset", email = "asset8k@gmail.com" }
@@ -22,8 +22,8 @@ dependencies = [
     "sqlalchemy[asyncio]>=2.0.54",
 ]
 
-[project.scripts]
-pole-position = "pole_position:main"
+[tool.fastapi]
+entrypoint = "pole_position.main:app"
 
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]

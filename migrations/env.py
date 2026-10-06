@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from pole_position.chat.model import Conversation, Message  # noqa: F401
 from pole_position.config import settings
-from pole_position.database import Base
+from pole_position.database import Base, database_connect_args
 from pole_position.users.model import User  # noqa: F401
 
 # this is the Alembic Config object, which provides
@@ -77,6 +77,7 @@ async def run_async_migrations() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args=database_connect_args(),
     )
 
     async with connectable.connect() as connection:

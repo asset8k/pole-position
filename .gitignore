@@ -22,3 +22,12 @@ regulations/
 
 # Artifacts
 artifacts/
+
+# Generated release bundle (uploaded to FastAPI Cloud, never GitHub)
+deployment_data/
+.fastapicloud/
+.vercel/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.DS_Store

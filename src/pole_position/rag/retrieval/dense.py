@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from pathlib import Path
 
 from openai import OpenAI
 from qdrant_client import QdrantClient, models
 
 from pole_position.corpus.manifest import load_manifest
+from pole_position.config import settings
 from pole_position.corpus.schemas import RegulationSection
 from pole_position.rag.contracts import RetrievalChunk
 from pole_position.rag.indexing.embeddings import embed_texts
@@ -40,7 +40,7 @@ def retrieve_dense(
 
     if document_ids is None:
         manifest = load_manifest(
-            Path(__file__).resolve().parents[4]
+            settings.corpus_root.resolve()
             / "data/manifests/2026_f1_regulations.json"
         )
         document_ids = tuple(

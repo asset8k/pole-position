@@ -62,4 +62,7 @@ export function createApi(client: ApiClient = createApiClient()) {
 }
 
 // Session storage is owned by useSession, never by the transport layer.
-export const api = createApi(createApiClient({ onUnauthorized: reportUnauthorized }));
+export const api = createApi(createApiClient({
+  baseUrl: import.meta.env.VITE_API_BASE_URL || '/api',
+  onUnauthorized: reportUnauthorized,
+}));

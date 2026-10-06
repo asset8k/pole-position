@@ -1,0 +1,12 @@
+# FastAPI Cloud is backend-only; Vercel builds the frontend separately.
+frontend/
+tests/
+docs/
+scripts/
+regulations/
+artifacts/
+.github/
+
+# Generated, validated manifest + active chunks; no secrets or original PDFs.
+!deployment_data/
+!deployment_data/**

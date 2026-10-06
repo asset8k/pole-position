@@ -15,7 +15,7 @@ from pole_position.corpus import updates
 from pole_position.corpus.schemas import CorpusManifest, RegulationDocument
 from pole_position.corpus.verification import calculate_sha256
 from pole_position.rag.contracts import ChunkedDocument
-from pole_position.rag.indexing.qdrant_store import point_from_chunk
+from pole_position.rag.indexing.qdrant_store import ensure_collection, point_from_chunk
 from pole_position.rag.retrieval.dense import retrieve_dense
 
 SCRIPT_PATH = Path(__file__).resolve().parents[2] / "scripts/update_regulations.py"
@@ -71,7 +71,7 @@ def project(tmp_path):
 
 
 def add_old_points(client, manifest, root):
-    updates.ensure_collection(client, "test", updates.VECTOR_SIZE)
+    ensure_collection(client, "test", updates.VECTOR_SIZE)
     for document in manifest.documents:
         chunked = ChunkedDocument.model_validate_json(
             (root / "artifacts/chunks" / f"{document.document_id}.json").read_text()
