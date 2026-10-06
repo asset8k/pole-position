@@ -1,0 +1,762 @@
+{
+  "status": "completed",
+  "started_at": "2026-10-05T18:45:21.655358+00:00",
+  "updated_at": "2026-10-05T18:50:25.310270+00:00",
+  "elapsed_seconds": 303.654,
+  "selected_cases": 40,
+  "completed_cases": 40,
+  "embedding_model": "text-embedding-3-small",
+  "dataset_sha256": "0ad32c0cd853263f06000fc613ac3687286742c1da7c6e53a7506677761849dd",
+  "manifest_sha256": "c07de45afd1cd3a6b3ec9ee2fb6650883f8fadbeff629086890634fc5c8de741",
+  "source_report_filename": "retrieval-20261005T184521655358Z.json",
+  "artifact_kind": "Derived metrics-only evidence; retrieved PDF text omitted",
+  "configuration": {
+    "collection_name": "fia_regulations",
+    "model": "gpt-6-luna",
+    "candidate_k": 20,
+    "rrf_k": 60,
+    "include_reranking": true
+  },
+  "summaries": {
+    "dense": {
+      "evaluated_cases": 36,
+      "skipped_cases": 4,
+      "recall_at_5": 0.9444444444444444,
+      "recall_at_10": 0.9444444444444444,
+      "mrr_at_10": 0.9189814814814815
+    },
+    "hybrid": {
+      "evaluated_cases": 36,
+      "skipped_cases": 4,
+      "recall_at_5": 0.9861111111111112,
+      "recall_at_10": 0.9861111111111112,
+      "mrr_at_10": 0.9291666666666667
+    },
+    "hybrid_reranked": {
+      "evaluated_cases": 36,
+      "skipped_cases": 4,
+      "recall_at_5": 0.9861111111111112,
+      "recall_at_10": 0.9861111111111112,
+      "mrr_at_10": 1.0
+    }
+  },
+  "metric_order": [
+    "recall_at_5",
+    "recall_at_10",
+    "reciprocal_rank_at_10"
+  ],
+  "case_metrics": [
+    {
+      "case_id": "general_composition_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "general_preamble_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "general_penalty_points_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "general_nonbinding_documents_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "general_pu_registration_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "general_trophies_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "sporting_dry_tyres_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "sporting_dry_tyres_penalty_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "sporting_pu_penalties_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "sporting_red_flag_tyres_001",
+      "answerable": true,
+      "dense": [
+        0.5,
+        0.5,
+        1.0
+      ],
+      "hybrid": [
+        0.5,
+        0.5,
+        1.0
+      ],
+      "hybrid_reranked": [
+        0.5,
+        0.5,
+        1.0
+      ]
+    },
+    {
+      "case_id": "sporting_safety_car_laps_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "sporting_parc_ferme_brakes_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "sporting_afc_definition_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        0.5
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "technical_coordinates_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "technical_minimum_mass_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "technical_engine_capacity_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "technical_engine_cylinders_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "technical_width_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "financial_team_scope_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "financial_team_obligations_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        0.25
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "financial_marketing_exclusion_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "financial_team_definitive_language_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "financial_pu_scope_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        0.3333333333333333
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        0.25
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "financial_pu_obligations_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "financial_pu_cap_amounts_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "financial_pu_reliability_table_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "operational_environmental_accreditation_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "operational_team_summer_shutdown_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "operational_atp_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "operational_wind_on_time_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        0.5
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        0.5
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "operational_atr_definition_001",
+      "answerable": true,
+      "dense": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        0.2
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "cross_document_cost_cap_scope_001",
+      "answerable": true,
+      "dense": [
+        0.5,
+        0.5,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "cross_document_relevant_costs_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "follow_up_tyre_penalties_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "follow_up_pu_penalties_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "follow_up_team_winter_shutdown_001",
+      "answerable": true,
+      "dense": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hybrid_reranked": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "case_id": "unanswerable_championship_result_001",
+      "answerable": false,
+      "dense": null,
+      "hybrid": null,
+      "hybrid_reranked": null
+    },
+    {
+      "case_id": "unanswerable_driver_salary_001",
+      "answerable": false,
+      "dense": null,
+      "hybrid": null,
+      "hybrid_reranked": null
+    },
+    {
+      "case_id": "unanswerable_private_car_data_001",
+      "answerable": false,
+      "dense": null,
+      "hybrid": null,
+      "hybrid_reranked": null
+    },
+    {
+      "case_id": "unanswerable_personal_information_001",
+      "answerable": false,
+      "dense": null,
+      "hybrid": null,
+      "hybrid_reranked": null
+    }
+  ]
+}
