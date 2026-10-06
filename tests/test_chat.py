@@ -1,11 +1,12 @@
 from collections.abc import Iterator
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 from openai import OpenAI
 from qdrant_client import QdrantClient
 
+from pole_position.auth.dependencies import get_optional_current_user
 from pole_position.chat.router import (
     CHUNKS_DIR,
     MANIFEST_PATH,
@@ -24,6 +25,7 @@ from pole_position.rag.generation.citations import ValidatedAnswer, ValidatedCit
 from pole_position.rag.generation.prompts import INSUFFICIENT_EVIDENCE_ANSWER
 from pole_position.rag.retrieval.dense import DenseHit
 from pole_position.rag.retrieval.sparse import SparseCorpus
+from pole_position.users.model import User
 
 
 @pytest.fixture
@@ -139,6 +141,44 @@ def test_guest_chat_passes_history_to_rag(
     assert response.json()["conversation_id"] is None
     assert answer_mock.call_args.args == ("And subsequent ones?",)
     assert answer_mock.call_args.kwargs["history"] == history
+
+
+@pytest.mark.parametrize(
+    ("authenticated", "conversation_id"), [(True, None), (True, 42), (False, None)],
+)
+def test_title_is_generated_only_for_a_new_saved_conversation(
+    client: tuple[TestClient, Mock, Mock, Mock],
+    authenticated: bool,
+    conversation_id: int | None,
+) -> None:
+    test_client, openai_client, _, _ = client
+    user = User(id=7, username="owner", password_hash="unused") if authenticated else None
+    app.dependency_overrides[get_optional_current_user] = lambda: user
+    with (
+        patch("pole_position.chat.router.answer_question", return_value=make_answer()),
+        patch("pole_position.chat.router.generate_conversation_title", return_value="Power unit allocation penalties") as title_mock,
+        patch("pole_position.chat.router.chat_service.get_recent_history", new_callable=AsyncMock, return_value=[]),
+        patch("pole_position.chat.router.chat_service.save_chat_turn", new_callable=AsyncMock, return_value=Mock(id=42)) as save_mock,
+    ):
+        response = test_client.post("/api/chat", json={
+            "message": "What is the power unit penalty?", "conversation_id": conversation_id,
+        })
+    assert response.status_code == 200
+    if authenticated and conversation_id is None:
+        title_mock.assert_called_once_with(
+            "What is the power unit penalty?", client=openai_client, model=settings.answer_model,
+        )
+        assert save_mock.call_args.kwargs["title"] == "Power unit allocation penalties"
+    else:
+        title_mock.assert_not_called()
+    if authenticated:
+        assert save_mock.call_args.kwargs["conversation_id"] == conversation_id
+        assert response.json()["conversation_id"] == 42
+        if conversation_id is not None:
+            assert save_mock.call_args.kwargs["title"] is None
+    else:
+        save_mock.assert_not_awaited()
+        assert response.json()["conversation_id"] is None
 
 
 def test_chat_can_disable_reranking(

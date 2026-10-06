@@ -16,6 +16,7 @@ from pole_position.chat.router import (
     get_sparse_corpus,
 )
 from pole_position.chat.schemas import ChatHistoryMessage
+from pole_position.chat.title_generator import ConversationTitle
 from pole_position.main import app
 from pole_position.rag.contracts import RetrievalChunk
 from pole_position.rag.generation.citations import ValidatedAnswer, ValidatedCitation
@@ -53,6 +54,10 @@ def client(
     test_client, db = db_client
     previous_overrides = app.dependency_overrides.copy()
     openai_client = Mock(spec=OpenAI)
+    openai_client.with_options.return_value.responses.parse.return_value = Mock(
+        status="completed",
+        output_parsed=ConversationTitle(title="Power unit allocation penalties"),
+    )
     qdrant_client = Mock(spec=QdrantClient)
     sparse_corpus = Mock(spec=SparseCorpus)
     app.dependency_overrides[get_openai_client] = lambda: openai_client
@@ -120,7 +125,7 @@ def test_authenticated_chat_creates_conversation_and_saves_citations(
     detail = test_client.get(f"/api/conversations/{conversation_id}", headers=headers)
     assert detail.status_code == 200
     saved = detail.json()
-    assert saved["title"] == "What is the power unit penalty?"
+    assert saved["title"] == "Power unit allocation penalties"
     assert [item["role"] for item in saved["messages"]] == ["user", "assistant"]
     assert saved["messages"][0]["content"] == "What is the power unit penalty?"
     assert saved["messages"][0]["citations"] == []
@@ -157,11 +162,31 @@ def test_authenticated_chat_appends_to_existing_conversation(
     detail = test_client.get(
         f"/api/conversations/{first['conversation_id']}", headers=headers
     ).json()
-    assert detail["title"] == "What is the power unit penalty?"
+    assert detail["title"] == "Power unit allocation penalties"
     assert len(detail["messages"]) == 4
     assert detail["messages"][2]["content"] == (
         "What is the penalty for a subsequent extra element?"
     )
+
+
+def test_title_api_timeout_still_saves_the_answer_with_a_short_fallback(
+    client: tuple[TestClient, AsyncSession, Mock],
+) -> None:
+    test_client, db, _ = client
+    openai_client = app.dependency_overrides[get_openai_client]()
+    openai_client.with_options.return_value.responses.parse.side_effect = TimeoutError()
+    headers = auth_headers(test_client)
+    message = "How do all of my team's many sponsors affect regulatory compliance?"
+    response = test_client.post("/api/chat", headers=headers, json={"message": message})
+    assert response.status_code == 200
+    detail = test_client.get(
+        f"/api/conversations/{response.json()['conversation_id']}", headers=headers,
+    ).json()
+    assert len(detail["title"]) <= 50
+    assert detail["title"].endswith("…")
+    assert detail["messages"][0]["content"] == message
+    assert detail["messages"][1]["content"] == response.json()["answer"]
+    assert count_rows(test_client, db, Conversation) == 1
 
 
 def test_list_conversations_returns_only_owned_threads(
@@ -255,7 +280,7 @@ def test_unowned_and_missing_conversations_have_identical_errors(
     original = test_client.get(
         f"/api/conversations/{saved['conversation_id']}", headers=owner_headers
     ).json()
-    assert original["title"] == "What is the power unit penalty?"
+    assert original["title"] == "Power unit allocation penalties"
     assert len(original["messages"]) == 2
 
 
@@ -313,7 +338,7 @@ def test_rename_rejects_invalid_titles(
     response = test_client.patch(path, headers=headers, json={"title": title})
     assert response.status_code == 422
     assert test_client.get(path, headers=headers).json()["title"] == (
-        "What is the power unit penalty?"
+        "Power unit allocation penalties"
     )
 
 

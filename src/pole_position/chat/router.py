@@ -32,6 +32,7 @@ from pole_position.chat.schemas import (
     ConversationResponse,
     ConversationUpdateRequest,
 )
+from pole_position.chat.title_generator import generate_conversation_title
 from pole_position.config import settings
 from pole_position.corpus.schemas import CorpusManifest
 from pole_position.database import get_db
@@ -168,6 +169,14 @@ async def chat(
 
     saved_conversation_id: int | None = None
     if current_user is not None:
+        title = None
+        if request.conversation_id is None:
+            title = await run_in_threadpool(
+                generate_conversation_title,
+                request.message,
+                client=openai_client,
+                model=settings.answer_model,
+            )
         saved = await chat_service.save_chat_turn(
             db,
             user_id=current_user.id,
@@ -175,6 +184,7 @@ async def chat(
             message=request.message,
             answer=result.answer,
             citations=citations,
+            title=title,
         )
         if saved is None:
             # A conversation may have been deleted while RAG was running.

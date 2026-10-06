@@ -55,7 +55,8 @@ def test_conversation_title_is_single_line_and_bounded() -> None:
     assert service.make_conversation_title("  What\n  is the penalty?  ") == (
         "What is the penalty?"
     )
-    assert len(service.make_conversation_title("a" * 200)) == 160
+    assert len(service.make_conversation_title("a" * 200)) == 50
+    assert service.make_conversation_title("a" * 200).endswith("…")
     with pytest.raises(ValueError):
         service.make_conversation_title(" \n ")
 
@@ -225,6 +226,37 @@ def test_follow_up_turn_preserves_title_and_message_order(
             message.id for message in detail.messages
         )
         assert await db.scalar(select(func.count()).select_from(Conversation)) == 1
+
+    assert client.portal is not None
+    client.portal.call(check)
+
+
+def test_generated_title_is_saved_and_manual_rename_survives_follow_up(
+    db_client: tuple[TestClient, AsyncSession],
+) -> None:
+    client, db = db_client
+
+    async def check() -> None:
+        user = await add_user(db)
+        saved = await service.save_chat_turn(
+            db, user_id=user.id, message="A much longer original question about sponsors",
+            answer="An answer", citations=[], title="Sponsorship and team compliance",
+        )
+        assert saved is not None
+        assert saved.title == "Sponsorship and team compliance"
+        renamed = await service.rename_conversation(
+            db, user_id=user.id, conversation_id=saved.id, title="My sponsor notes",
+        )
+        assert renamed is not None
+        follow_up = await service.save_chat_turn(
+            db, user_id=user.id, conversation_id=saved.id, message="And that?",
+            answer="Another answer", citations=[], title="Must not replace manual title",
+        )
+        assert follow_up is not None
+        assert follow_up.title == "My sponsor notes"
+        detail = await service.get_conversation(db, user_id=user.id, conversation_id=saved.id)
+        assert detail is not None
+        assert detail.messages[0].content == "A much longer original question about sponsors"
 
     assert client.portal is not None
     client.portal.call(check)

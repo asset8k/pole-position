@@ -22,7 +22,7 @@ def make_conversation_title(first_message: str) -> str:
     title = " ".join(first_message.split())
     if not title:
         raise ValueError("First message cannot be empty")
-    return title[:160]
+    return title if len(title) <= 50 else title[:49].rstrip() + "…"
 
 
 async def _find_owned_conversation(
@@ -123,6 +123,7 @@ async def save_chat_turn(
     answer: str,
     citations: Sequence[Citation],
     conversation_id: int | None = None,
+    title: str | None = None,
 ) -> ConversationResponse | None:
     """Save a completed turn for an authenticated user, atomically.
 
@@ -140,7 +141,11 @@ async def save_chat_turn(
         if conversation_id is None:
             conversation = Conversation(
                 user_id=user_id,
-                title=make_conversation_title(message),
+                title=(
+                    ConversationUpdateRequest(title=title).title
+                    if title is not None
+                    else make_conversation_title(message)
+                ),
             )
             db.add(conversation)
             await db.flush()
