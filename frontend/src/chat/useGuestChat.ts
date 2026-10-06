@@ -10,6 +10,7 @@ export interface GuestMessage {
   role: MessageRole;
   content: string;
   citations: Citation[];
+  animateAnswer?: boolean;
 }
 
 export type ActiveTurn =
@@ -101,7 +102,7 @@ export function useChat({ sendMessage = api.chat.send, token = null, onSaved, on
         const completed: GuestMessage[] = [
           ...messagesRef.current,
           { id: nextId.current++, role: 'user', content: message, citations: [] },
-          { id: nextId.current++, role: 'assistant', content: response.answer, citations: response.citations },
+          { id: nextId.current++, role: 'assistant', content: response.answer, citations: response.citations, animateAnswer: true },
         ];
         messagesRef.current = completed;
         setMessages(completed);

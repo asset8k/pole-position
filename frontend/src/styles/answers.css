@@ -1,6 +1,13 @@
 .answer-content { font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; }
 .answer-content > * + * { margin-top: 16px; }
 .answer-content strong { font-weight: 650; }
+.answer-reveal-word { animation: answer-word-enter 160ms ease-out; }
+@keyframes answer-word-enter { from { opacity: .4; } to { opacity: 1; } }
+.answer-reveal-controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; margin-top: 14px; }
+.answer-reveal-controls .button { color: var(--color-muted); font-size: 11px; font-weight: 500; padding: 8px 14px; }
+.answer-reveal-cursor { width: 5px; height: 5px; border-radius: 50%; background: #ffb0a9; margin-left: 2px; animation: answer-cursor 1s ease-in-out infinite alternate; }
+@keyframes answer-cursor { from { opacity: .45; } to { opacity: 1; } }
+.citation-button:disabled { cursor: default; }
 .answer-content h2 { font-size: 18px; font-weight: 600; letter-spacing: -.02em; margin: 22px 0 12px; }
 .answer-content > :first-child { margin-top: 0; }
 .answer-content ul, .answer-content ol { padding-left: 24px; margin-bottom: 0; }

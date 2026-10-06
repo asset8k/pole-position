@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 export function useChatScroll(messageCount: number, turnStatus: string | undefined) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLOListElement>(null);
   const following = useRef(true);
   const previous = useRef({ messageCount, turnStatus });
   const [hasNewMessages, setHasNewMessages] = useState(false);
@@ -25,6 +26,16 @@ export function useChatScroll(messageCount: number, turnStatus: string | undefin
     return () => window.removeEventListener('scroll', trackPosition);
   }, []);
 
+  useEffect(() => {
+    if (!contentRef.current || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => {
+      // Follow a growing answer only while the reader is already at the bottom.
+      if (following.current && !document.querySelector('dialog[open]')) jumpToLatest();
+    });
+    observer.observe(contentRef.current);
+    return () => observer.disconnect();
+  }, [jumpToLatest]);
+
   useLayoutEffect(() => {
     const sent = turnStatus === 'loading' && previous.current.turnStatus !== 'loading';
     const appended = messageCount > previous.current.messageCount;
@@ -34,5 +45,5 @@ export function useChatScroll(messageCount: number, turnStatus: string | undefin
     else if (appended) setHasNewMessages(true);
   }, [messageCount, turnStatus, jumpToLatest]);
 
-  return { bottomRef, hasNewMessages, jumpToLatest };
+  return { bottomRef, contentRef, hasNewMessages, jumpToLatest };
 }

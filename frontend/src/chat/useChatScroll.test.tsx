@@ -3,8 +3,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useChatScroll } from './useChatScroll';
 
 function Harness({ count, status }: { count: number; status?: string }) {
-  const { bottomRef, hasNewMessages, jumpToLatest } = useChatScroll(count, status);
-  return <><div ref={bottomRef} data-testid="bottom" />{hasNewMessages && <button onClick={jumpToLatest}>Jump</button>}</>;
+  const { bottomRef, contentRef, hasNewMessages, jumpToLatest } = useChatScroll(count, status);
+  return <><ol ref={contentRef} /><div ref={bottomRef} data-testid="bottom" />{hasNewMessages && <button onClick={jumpToLatest}>Jump</button>}</>;
 }
 const previousScroll = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'scrollIntoView');
 afterEach(() => {
@@ -25,6 +25,26 @@ function setup() {
 }
 
 describe('chat scroll intent', () => {
+  it('follows progressive content growth without stealing older reading position; disconnects on unmount', () => {
+    const { scroll, position } = setup();
+    let resized!: () => void;
+    const disconnect = vi.fn();
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(callback: () => void) { resized = callback; }
+      observe() {}
+      disconnect = disconnect;
+    });
+    const view = render(<Harness count={2} />);
+    scroll.mockClear();
+    act(() => resized());
+    expect(scroll).toHaveBeenCalledOnce();
+    position(1600);
+    scroll.mockClear();
+    act(() => resized());
+    expect(scroll).not.toHaveBeenCalled();
+    view.unmount();
+    expect(disconnect).toHaveBeenCalledOnce();
+  });
   it('follows new turns near the bottom but preserves older reading position until requested', () => {
     const { scroll, position } = setup();
     const view = render(<Harness count={2} />);

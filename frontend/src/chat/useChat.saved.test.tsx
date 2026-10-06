@@ -21,9 +21,11 @@ describe('saved chat selection and sends', () => {
     await act(async () => { expect(await result.current.openConversation(7)).toBe(true); });
     expect(result.current.selectedId).toBe(7);
     expect(result.current.messages[1].citations).toEqual(conversationDetail(7).messages[1].citations);
+    expect(result.current.messages[1].animateAnswer).toBeUndefined();
     await act(async () => { result.current.send('What about that?'); });
     expect(send).toHaveBeenCalledWith({ message: 'What about that?', conversation_id: 7 }, { token: 'token', signal: expect.any(AbortSignal) });
     expect(result.current.messages).toHaveLength(4);
+    expect(result.current.messages[3].animateAnswer).toBe(true);
     expect(new Set(result.current.messages.map((message) => message.id)).size).toBe(4);
   });
   it('preserves older messages beyond the ten used for backend contextualization', async () => {

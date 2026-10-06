@@ -20,7 +20,7 @@ interface ChatScreenProps {
 }
 
 export function ChatScreen({ messages, activeTurn, draft, composerRef, onChange, onSubmit, authenticated = false, title = 'Regulation chat' }: ChatScreenProps) {
-  const { bottomRef, hasNewMessages, jumpToLatest } = useChatScroll(messages.length, activeTurn?.status);
+  const { bottomRef, contentRef, hasNewMessages, jumpToLatest } = useChatScroll(messages.length, activeTurn?.status);
   const isPending = activeTurn?.status === 'loading';
   const [selectedSource, setSelectedSource] = useState<SelectedSource | null>(null);
   const selection = selectedSource && messages.some((message) => message.id === selectedSource.messageId)
@@ -39,12 +39,13 @@ export function ChatScreen({ messages, activeTurn, draft, composerRef, onChange,
         <span className="chat-heading__guest">{authenticated ? 'Saved to your account' : <>Guest <span aria-hidden="true">·</span> Clears on refresh</>}</span>
       </div>
       <div role="log" aria-label="Conversation messages" aria-live="polite" aria-relevant="additions">
-        <ol className="chat-messages">
+        <ol ref={contentRef} className="chat-messages">
           {messages.map((message) => (
             <li key={message.id} className={`chat-message chat-message--${message.role}`}>
               <span className="chat-message__author">{message.role === 'user' ? 'You' : 'Pole Position'}</span>
               {message.role === 'assistant'
                 ? <AnswerContent content={message.content} citations={message.citations}
+                    animate={message.animateAnswer === true && message === messages.at(-1) && !activeTurn}
                     onOpenSource={(source, trigger) => setSelectedSource({ messageId: message.id, source, trigger })} />
                 : <p className="chat-message__text">{message.content}</p>}
             </li>

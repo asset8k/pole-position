@@ -21,6 +21,7 @@ test('formatted citations open their own excerpt with modal focus and Escape res
   await page.screenshot({ path: testInfo.outputPath('formatted-answer.png'), fullPage: true, animations: 'disabled' });
   const trigger = answer.getByRole('button', { name: 'View source S1: B6.3.6' });
   await expect(trigger).toHaveAttribute('title', 'Sporting Regulations · PDF page 58');
+  await expect(trigger).toBeEnabled();
   await trigger.focus();
   await page.keyboard.press('Enter');
   const drawer = page.getByRole('dialog', { name: 'Source S1' });
