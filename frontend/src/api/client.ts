@@ -23,6 +23,14 @@ export class NetworkError extends Error {
   }
 }
 
+export class RequestTimeoutError extends NetworkError {
+  constructor() {
+    super();
+    this.name = 'RequestTimeoutError';
+    this.message = 'The server took too long to respond. Please try again shortly.';
+  }
+}
+
 export class ResponseError extends Error {
   constructor(readonly status: number) {
     super('The server returned an unexpected response. Please try again.');
@@ -44,6 +52,61 @@ export interface ApiClientOptions {
   baseUrl?: string;
   fetch?: typeof globalThis.fetch;
   onUnauthorized?: (token: string) => void;
+  readTimeoutMs?: number;
+  mutationTimeoutMs?: number;
+}
+
+const READ_TIMEOUT_MS = 15_000;
+const MUTATION_TIMEOUT_MS = 180_000; // Chat includes retrieval, reranking, and generation.
+const READ_RETRIES = 2;
+const RETRY_DELAY_MS = 500;
+const RETRY_STATUSES = new Set([502, 503, 504]);
+
+function abortReason(signal: AbortSignal): unknown {
+  return signal.reason ?? new DOMException('Aborted', 'AbortError');
+}
+
+async function withDeadline<T>(
+  operation: (signal: AbortSignal) => Promise<T>, timeoutMs: number, signal?: AbortSignal,
+): Promise<T> {
+  if (signal?.aborted) throw abortReason(signal);
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout>;
+  let onAbort: () => void;
+  const interrupted = new Promise<never>((_resolve, reject) => {
+    onAbort = () => {
+      reject(abortReason(signal!));
+      controller.abort();
+    };
+    signal?.addEventListener('abort', onAbort, { once: true });
+    timer = setTimeout(() => {
+      reject(new RequestTimeoutError());
+      controller.abort();
+    }, timeoutMs);
+  });
+  try {
+    // The race also bounds response-body reads and non-cooperative fetch mocks.
+    return await Promise.race([interrupted, operation(controller.signal)]);
+  } finally {
+    clearTimeout(timer!);
+    signal?.removeEventListener('abort', onAbort!);
+  }
+}
+
+async function retryDelay(milliseconds: number, signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) throw abortReason(signal);
+  return new Promise((resolve, reject) => {
+    const onAbort = () => {
+      clearTimeout(timer);
+      signal?.removeEventListener('abort', onAbort);
+      reject(abortReason(signal!));
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, milliseconds);
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -86,6 +149,11 @@ function isAbort(error: unknown): boolean {
 }
 
 export function createApiClient(options: ApiClientOptions = {}) {
+  const readTimeoutMs = options.readTimeoutMs ?? READ_TIMEOUT_MS;
+  const mutationTimeoutMs = options.mutationTimeoutMs ?? MUTATION_TIMEOUT_MS;
+  if (![readTimeoutMs, mutationTimeoutMs].every((value) => Number.isFinite(value) && value > 0)) {
+    throw new TypeError('Request timeouts must be positive finite milliseconds.');
+  }
   const baseUrl = (options.baseUrl ?? '/api').replace(/\/+$/, '');
   // Same-origin by default; an explicitly configured HTTP(S) API is also allowed.
   if (!/^\/(?!\/)/.test(baseUrl) && !/^https?:\/\//.test(baseUrl)) {
@@ -106,24 +174,37 @@ export function createApiClient(options: ApiClientOptions = {}) {
     if (requestOptions.token) headers.set('Authorization', `Bearer ${requestOptions.token}`);
     const body = requestOptions.body === undefined ? undefined : JSON.stringify(requestOptions.body);
 
-    let response: Response;
-    let text: string;
-    try {
-      // Never retry mutations automatically; chat can create a saved conversation.
-      response = await (options.fetch ?? globalThis.fetch)(`${baseUrl}${path}`, {
-        method: requestOptions.method ?? 'GET',
-        headers,
-        body,
-        signal: requestOptions.signal,
-        credentials: 'omit',
-      });
-      if (response.status === 204) return undefined as T;
-      text = await response.text();
-    } catch (error) {
-      // Let callers distinguish cancellation from a failed connection.
-      if (isAbort(error) || requestOptions.signal?.aborted) throw error;
-      throw new NetworkError();
+    const method = requestOptions.method ?? 'GET';
+    const safeRead = method === 'GET' && body === undefined;
+
+    async function send() {
+      for (let attempt = 0; ; attempt += 1) {
+        const canRetry = safeRead && attempt < READ_RETRIES;
+        try {
+          const result = await withDeadline(async (signal) => {
+            const response = await (options.fetch ?? globalThis.fetch)(`${baseUrl}${path}`, {
+              method, headers, body, signal, credentials: 'omit',
+            });
+            if (canRetry && RETRY_STATUSES.has(response.status)) {
+              // Discard retryable error bodies without parsing private diagnostics.
+              void response.body?.cancel().catch(() => undefined);
+              return { response, text: '' };
+            }
+            return { response, text: response.status === 204 ? '' : await response.text() };
+          }, safeRead ? readTimeoutMs : mutationTimeoutMs, requestOptions.signal);
+          if (!canRetry || !RETRY_STATUSES.has(result.response.status)) return result;
+        } catch (error) {
+          // User cancellation never retries; a deadline is a recoverable failure.
+          if (isAbort(error) || requestOptions.signal?.aborted) throw error;
+          if (!canRetry) throw error instanceof RequestTimeoutError ? error : new NetworkError();
+        }
+        // Only GET without a body can reach this backoff. Never replay mutations.
+        await retryDelay(RETRY_DELAY_MS * 2 ** attempt, requestOptions.signal);
+      }
     }
+
+    const { response, text } = await send();
+    if (response.status === 204) return undefined as T;
 
     const contentType = response.headers.get('Content-Type')?.split(';')[0].trim().toLowerCase();
     const isJson = contentType === 'application/json' || contentType?.endsWith('+json');

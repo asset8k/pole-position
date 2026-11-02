@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     database_ssl: bool = False
     database_ssl_ca_file: Path | None = None
     test_database_url: str | None = None
+    keepalive_token: SecretStr = SecretStr("")
     jwt_secret_key: SecretStr
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60

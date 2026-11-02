@@ -9,6 +9,7 @@ from pole_position.auth.router import router as auth_router
 from pole_position.chat.router import get_sparse_corpus, router as chat_router
 from pole_position.config import settings
 from pole_position.database import engine
+from pole_position.monitoring import router as monitoring_router
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,7 @@ def create_app() -> FastAPI:
     )
     application.include_router(chat_router)
     application.include_router(auth_router, prefix="/api")
+    application.include_router(monitoring_router)
 
     @application.get("/api/health")
     async def health_check():

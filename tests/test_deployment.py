@@ -5,7 +5,13 @@ from fastapi.testclient import TestClient
 
 from pole_position import main
 from pole_position.config import settings
-from pole_position.database import database_connect_args
+from pole_position.database import (
+    DATABASE_COMMAND_TIMEOUT_SECONDS,
+    DATABASE_CONNECT_TIMEOUT_SECONDS,
+    DATABASE_POOL_TIMEOUT_SECONDS,
+    database_connect_args,
+    engine,
+)
 
 
 def test_production_cors_allows_only_configured_origin(monkeypatch):
@@ -54,7 +60,15 @@ def test_database_tls_verifies_certificates(monkeypatch):
     assert context.verify_mode == ssl.CERT_REQUIRED
     assert context.check_hostname
     monkeypatch.setattr(settings, "database_ssl", False)
-    assert database_connect_args() == {}
+    assert database_connect_args() == {
+        "timeout": DATABASE_CONNECT_TIMEOUT_SECONDS,
+        "command_timeout": DATABASE_COMMAND_TIMEOUT_SECONDS,
+    }
+
+
+def test_database_pool_detects_stale_connections_and_bounds_checkout():
+    assert engine.pool._pre_ping is True
+    assert engine.pool.timeout() == DATABASE_POOL_TIMEOUT_SECONDS
 
 
 def test_database_tls_accepts_the_official_supabase_ca(monkeypatch):

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ApiError, createApiClient, NetworkError, ResponseError } from './client';
 
 function mockClient(response: Response) {
-  const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(response);
+  const fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => response.clone());
   return { client: createApiClient({ fetch }), fetch };
 }
 
@@ -29,12 +29,13 @@ describe('JSON API client', () => {
     expect(headers.has('Authorization')).toBe(false);
   });
 
-  it('passes a bearer token and AbortSignal without setting a body on GET', async () => {
+  it('passes a bearer token and a deadline-aware AbortSignal without setting a body on GET', async () => {
     const { client, fetch } = mockClient(Response.json({ id: 1 }));
     const controller = new AbortController();
     await client.request('/auth/me', { token: 'test-token', signal: controller.signal });
     const options = fetch.mock.calls[0][1];
-    expect(options?.signal).toBe(controller.signal);
+    expect(options?.signal).toBeInstanceOf(AbortSignal);
+    expect(options?.signal?.aborted).toBe(false);
     expect(options?.body).toBeUndefined();
     expect(new Headers(options?.headers).get('Authorization')).toBe('Bearer test-token');
     expect(new Headers(options?.headers).has('Content-Type')).toBe(false);
@@ -129,8 +130,9 @@ describe('JSON API client', () => {
   it('reports a broken response stream as a network failure', async () => {
     const response = Response.json({});
     vi.spyOn(response, 'text').mockRejectedValue(new TypeError('Connection lost'));
-    const { client } = mockClient(response);
-    await expect(client.request('/chat')).rejects.toBeInstanceOf(NetworkError);
+    const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(response);
+    const client = createApiClient({ fetch });
+    await expect(client.request('/chat', { method: 'POST' })).rejects.toBeInstanceOf(NetworkError);
   });
 
   it('preserves aborts so cancelled requests are not displayed as network errors', async () => {

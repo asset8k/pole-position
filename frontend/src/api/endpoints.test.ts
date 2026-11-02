@@ -114,8 +114,13 @@ describe('typed endpoint helpers', () => {
 
   it('passes cancellation to mutation requests', async () => {
     const { api, fetch } = fixture();
+    fetch.mockImplementation(() => new Promise(() => {}));
     const controller = new AbortController();
-    await api.conversations.rename(2, { title: 'Tyres' }, { ...token, signal: controller.signal });
-    expect(fetch.mock.calls[0][1]?.signal).toBe(controller.signal);
+    const assertion = expect(api.conversations.rename(2, { title: 'Tyres' }, { ...token, signal: controller.signal }))
+      .rejects.toMatchObject({ name: 'AbortError' });
+    controller.abort();
+    await assertion;
+    expect(fetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 });

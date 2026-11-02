@@ -91,3 +91,10 @@ currently has no distributed rate limiter. Configure provider spending alerts
 and decide appropriate usage limits before promoting the public demo widely.
 Hosting free/Hobby tiers also have resource limits; do not upgrade without
 approval.
+
+## Optional availability monitoring
+
+See [KEEPALIVE_SETUP.md](KEEPALIVE_SETUP.md) for the private database probe,
+project-specific token, cron-job.org configuration, and current Hobby/Free
+budget caveats. Monitoring is configured separately after deployment; it does
+not make free hosting always-on.
